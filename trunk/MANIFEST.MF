@@ -1,4 +1,4 @@
-Manifest-Version: 0.2.30
+Manifest-Version: 0.2.49
 Ant-Version: Apache Ant 1.7.0
 Created-By: pittacus@gmail.com
 Cytoscape-Plugin: dynamic.Perturbation

@@ -12,22 +12,41 @@
     <property name="bin.dir"     value="bin"/>
 	<property name="jar.dir"     value="release"/>
 	<property name="release.dir"     value="../cytoscape-v2.6.2/plugins"/>
-
 	<property name="version"     value="${major.number}.${minor.number}.${build.number}"/>
 	<property name="jarfile"     value="${jar.dir}/PerturbationAnalyzer.v${version}.jar"/>
     <property name="main-class"  value="dynamic.Perturbation"/>
 
-   	<manifest file="MANIFEST.MF">
+	<mkdir dir="${bin.dir}"/>
+	<mkdir dir="${jar.dir}"/>
+
+	<manifest file="MANIFEST.MF">
 	    <attribute name="Manifest-Version" value="${version}"/>
 	    <attribute name="Created-By" value="pittacus@gmail.com"/>
 	    <attribute name="Cytoscape-Plugin" value="${main-class}"/>
   	</manifest>
-	
-   <target name="compile" description="Compilation target">
-        <javac srcdir="${src.dir}" destdir="${bin.dir}"/>
+
+    <target name="compile" description="Compilation target">
+        <javac srcdir="${src.dir}" destdir="${bin.dir}">
+            <classpath>
+              <pathelement path="${classpath}"/>
+            	<pathelement location="../cytoscape-v2.6.2/lib/cytoscape-cruft-obo.jar"/>
+            	<pathelement location="../cytoscape-v2.6.2/lib/cytoscape-geom-rtree.jar"/>
+            	<pathelement location="../cytoscape-v2.6.2/lib/cytoscape-geom-spacial.jar"/>
+            	<pathelement location="../cytoscape-v2.6.2/lib/cytoscape-graph-dynamic.jar"/>
+            	<pathelement location="../cytoscape-v2.6.2/lib/cytoscape-graph-fixed.jar"/>
+            	<pathelement location="../cytoscape-v2.6.2/lib/cytoscape-render-export.jar"/>
+            	<pathelement location="../cytoscape-v2.6.2/lib/cytoscape-render-immed.jar"/>
+            	<pathelement location="../cytoscape-v2.6.2/lib/cytoscape-render-stateful.jar"/>
+            	<pathelement location="../cytoscape-v2.6.2/lib/cytoscape-task.jar"/>
+            	<pathelement location="../cytoscape-v2.6.2/lib/cytoscape-util-intr.jar"/>
+            	<pathelement location="../cytoscape-v2.6.2/lib/giny.jar"/>
+            	<pathelement location="../cytoscape-v2.6.2/cytoscape.jar"/>
+            	<pathelement location="lib/jfreechart-1.0.12.jar"/>
+            	<pathelement location="lib/jcommon-1.0.15.jar"/>
+            </classpath>
+        </javac>
     </target>
 	
-
   	<target name="compress" depends="compile" description="Compression target">
         <jar jarfile="${jarfile}" manifest="MANIFEST.MF">
 		    <fileset dir="${bin.dir}" includes="dynamic/*.class"/>
