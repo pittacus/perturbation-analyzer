@@ -14,7 +14,7 @@
 	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-task.jar"/>
 	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-util-intr.jar"/>
 	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/giny.jar"/>
-	<classpathentry kind="lib" path="../gcode/lib/jfreechart-1.0.12.jar"/>
-	<classpathentry kind="lib" path="../Paper/gcode/lib/jcommon-1.0.15.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart-1.0.12.jar"/>
+	<classpathentry kind="lib" path="lib/jcommon-1.0.15.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
