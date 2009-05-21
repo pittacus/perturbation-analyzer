@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.event.*;
 /*
  * Created by JFormDesigner on Tue Mar 10 21:28:05 CST 2009
  */
@@ -43,10 +44,11 @@ public class ControlPanel extends JPanel{
 		quickLabel.setText("<html><FONT COLOR=BLUE>Quick Start</FONT></html>");
 
 		quickLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
 				if(evt.getClickCount() > 0){
 					try {
-						Process pc = Runtime.getRuntime().exec("cmd.exe /c start http://www.baidu.com");
+						Runtime.getRuntime().exec("cmd.exe /c start http://www.baidu.com");
 					} catch (IOException ex) {
 						System.out.println(ex.getMessage());
 						System.out.println();
@@ -57,10 +59,11 @@ public class ControlPanel extends JPanel{
 		
 		helpLabel.setText("<html><FONT COLOR=BLUE>Help</FONT></html>");
 		helpLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
 				if(evt.getClickCount() > 0){
 					try {
-						Process pc = Runtime.getRuntime().exec("cmd.exe /c start http://www.google.com");
+						Runtime.getRuntime().exec("cmd.exe /c start http://www.google.com");
 					} catch (IOException ex) {
 						System.out.println(ex.getMessage());
 						System.out.println();
@@ -82,49 +85,128 @@ public class ControlPanel extends JPanel{
 		        	}
 		        }
 	    });
-        this.changeFoldChoice.getEditor().getEditorComponent().addKeyListener(
+        changeFoldChoice.getEditor().getEditorComponent().addKeyListener(
             	new  KeyAdapter() {
-    		        public void keyReleased(KeyEvent event){
+    		        @Override
+					public void keyReleased(KeyEvent event){
     		        	try{
-    		        		Integer.parseInt(changeFoldChoice.getEditor().getItem().toString());
+    		        		Double.parseDouble(changeFoldChoice.getEditor().getItem().toString());
     		        		changeFoldChoice.setBackground(Color.WHITE);
     		        	}catch(Exception e){
     		        		changeFoldChoice.setBackground(Color.YELLOW);
     		        	}
     		        }
     	    });
+        dissociationConstant.getDocument().addDocumentListener(
+            	new  DocumentListener() {
+    		        public void changedUpdate(DocumentEvent e) {f();}
+    		        public void insertUpdate(DocumentEvent e) {f();}
+    		        public void removeUpdate(DocumentEvent e) {f();}
+    		        void f() {
+    		        	try{
+    		        		if(dissociationConstant.getText().compareTo(Config.DEFAULT_DISSOCIATION_CONSTANT)!=0)
+    		        			Double.parseDouble(dissociationConstant.getText());
+    		        		dissociationConstant.setBackground(Color.WHITE);
+    		        	}catch(Exception e){
+    		        		dissociationConstant.setBackground(Color.YELLOW);
+    		        	}
+    		        }
+    	    });
+        ButtonGroup group = new ButtonGroup();
+        group.add(singleMode);
+        group.add(batchMode);
+        
+        advancedOptionStateChanged(null);
+        resultNameFocusLost(null);
+  	}
+	public int getPerturbationType(){
+		if(singleMode.isSelected()){
+			return Config.PERTURBATION_SINGLE;
+		}
+		return Config.PERTURBATION_BATCH;
 	}
 
+	public String getResultName(){
+		return "Perturbation.result."+Perturbation.now();
+	}
+	
+	private void advancedOptionStateChanged(ChangeEvent e) {
+		boolean show = advancedOption.isSelected();
+		advancedOptionPanel.setVisible(show);
+		Icon icon = (Icon)(show?UIManager.get("Tree.expandedIcon"):UIManager.get("Tree.collapsedIcon"));
+		advancedOption.setIcon(icon);
+	}
+
+	private void dissociationConstantFocusGained(FocusEvent e) {
+		if(dissociationConstant.getText().compareTo(Config.DEFAULT_DISSOCIATION_CONSTANT)==0){
+			dissociationConstant.setText("");
+			dissociationConstant.setForeground(Color.BLACK);
+		}
+		else {
+			dissociationConstant.selectAll();
+		}
+	}
+
+	private void dissociationConstantFocusLost(FocusEvent e) {
+		if(dissociationConstant.getText().trim().length()==0){
+			dissociationConstant.setText(Config.DEFAULT_DISSOCIATION_CONSTANT);
+			dissociationConstant.setForeground(Color.LIGHT_GRAY);
+		}
+	}
+
+	private void resultNameFocusGained(FocusEvent e) {
+		if(resultName.getText().compareTo(Config.DEFAULT_RESULT_NAME)==0){
+			resultName.setText("");
+			resultName.setForeground(Color.BLACK);
+		}
+		else {
+			resultName.selectAll();
+		}
+	}
+
+	private void resultNameFocusLost(FocusEvent e) {
+		if(resultName.getText().trim().length()==0){
+			resultName.setText(Config.DEFAULT_RESULT_NAME);
+			resultName.setForeground(Color.LIGHT_GRAY);
+		}
+	}
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		// Generated using JFormDesigner Open Source Project license - unknown
 		JPanel configPanel = new JPanel();
-		JLabel label1 = new JLabel();
 		panel2 = new JPanel();
-		proteinAbundanceChoice = new JComboBox();
-		JLabel label3 = new JLabel();
+		singleMode = new JRadioButton();
+		panel18 = new JPanel();
+		textArea2 = new JTextArea();
+		panel5 = new JPanel();
+		batchMode = new JRadioButton();
+		panel17 = new JPanel();
+		textArea3 = new JTextArea();
+		configPanel4 = new JPanel();
 		panel3 = new JPanel();
-		resultChoice = new JComboBox();
-		JLabel label7 = new JLabel();
-		panel10 = new JPanel();
-		perturbationType = new JComboBox();
-		JLabel label5 = new JLabel();
+		JLabel label9 = new JLabel();
+		panel8 = new JPanel();
+		proteinAbundanceChoice = new JComboBox();
 		panel4 = new JPanel();
+		advancedOption = new JCheckBox();
+		hSpacer1 = new JPanel(null);
+		advancedOptionPanel = new JPanel();
+		JLabel label10 = new JLabel();
+		panel12 = new JPanel();
+		resultName = new JTextField();
+		label12 = new JLabel();
+		panel14 = new JPanel();
 		changeFoldChoice = new JComboBox();
-		JLabel label8 = new JLabel();
-		panel11 = new JPanel();
+		label14 = new JLabel();
+		panel16 = new JPanel();
+		dissociationConstant = new JTextField();
+		label13 = new JLabel();
+		panel15 = new JPanel();
 		iterativeCriteria = new JTextField();
 		JPanel configPanel2 = new JPanel();
 		JLabel label2 = new JLabel();
 		panel7 = new JPanel();
 		startCalculate = new JButton();
-		JPanel configPanel3 = new JPanel();
-		JLabel label6 = new JLabel();
-		panel5 = new JPanel();
-		resultAnalyseChoice = new JComboBox();
-		JLabel label4 = new JLabel();
-		panel9 = new JPanel();
-		startAnalysis = new JButton();
 		panel1 = new JPanel();
 		scrollPane1 = new JScrollPane();
 		infoText = new JTextArea();
@@ -137,70 +219,132 @@ public class ControlPanel extends JPanel{
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		configPanel.setBorder(new CompoundBorder(
+			new TitledBorder("Perturbation Type"),
+			new EmptyBorder(5, 5, 5, 5)));
+		configPanel.setFont(UIManager.getFont("Label.font"));
+		configPanel.setLayout(new GridLayout(0, 1, 5, 0));
+
+		panel2.setLayout(new BorderLayout());
+
+		singleMode.setText("Single Perturbation Mode");
+		singleMode.setSelected(true);
+		singleMode.setFont(UIManager.getFont("Label.font"));
+		panel2.add(singleMode, BorderLayout.NORTH);
+
+		panel18.setBorder(new EmptyBorder(0, 15, 0, 0));
+		panel18.setLayout(new GridLayout());
+
+		textArea2.setEditable(false);
+		textArea2.setEnabled(false);
+		textArea2.setOpaque(false);
+		textArea2.setText("1. Perturbate all proteins in same time\n2. Propagation analysis in one perturbation");
+		textArea2.setFont(UIManager.getFont("Label.font"));
+		panel18.add(textArea2);
+		panel2.add(panel18, BorderLayout.SOUTH);
+		configPanel.add(panel2);
+
+		panel5.setLayout(new BorderLayout());
+
+		batchMode.setText("Batch  Perturbation Mode");
+		batchMode.setFont(UIManager.getFont("Label.font"));
+		panel5.add(batchMode, BorderLayout.NORTH);
+
+		panel17.setBorder(new EmptyBorder(0, 15, 0, 0));
+		panel17.setLayout(new GridLayout());
+
+		textArea3.setEditable(false);
+		textArea3.setEnabled(false);
+		textArea3.setOpaque(false);
+		textArea3.setText("1. Perturbate one protein at a time\n2. Propagation analysis for many perturbations");
+		textArea3.setFont(UIManager.getFont("Label.font"));
+		panel17.add(textArea3);
+		panel5.add(panel17, BorderLayout.SOUTH);
+		configPanel.add(panel5);
+		add(configPanel);
+
+		configPanel4.setBorder(new CompoundBorder(
 			new TitledBorder("Model Configuration"),
 			new EmptyBorder(5, 5, 5, 5)));
-		configPanel.setLayout(new GridLayout(0, 1, 5, 5));
+		configPanel4.setFont(UIManager.getFont("Label.font"));
+		configPanel4.setLayout(new BoxLayout(configPanel4, BoxLayout.PAGE_AXIS));
 
-		label1.setText("Load as total protein concentration (double type)");
-		label1.setLabelFor(proteinAbundanceChoice);
-		label1.setIcon(UIManager.getIcon("Tree.leafIcon"));
-		label1.setHorizontalAlignment(SwingConstants.LEFT);
-		label1.setAlignmentX(0.5F);
-		configPanel.add(label1);
+		panel3.setLayout(new GridLayout(0, 1));
 
-		panel2.setBorder(new EmptyBorder(0, 15, 0, 0));
-		panel2.setLayout(new GridLayout());
+		label9.setText("Select total protein concentration");
+		label9.setLabelFor(proteinAbundanceChoice);
+		label9.setIcon(UIManager.getIcon("Tree.leafIcon"));
+		label9.setHorizontalAlignment(SwingConstants.LEFT);
+		label9.setAlignmentX(0.5F);
+		label9.setFont(UIManager.getFont("Label.font"));
+		label9.setToolTipText("It must be a double typed node attribute. You can import it from text file or excel by Cytoscape");
+		panel3.add(label9);
+
+		panel8.setBorder(new EmptyBorder(0, 15, 0, 0));
+		panel8.setLayout(new GridLayout());
 
 		proteinAbundanceChoice.setMinimumSize(new Dimension(10, 21));
 		proteinAbundanceChoice.setMaximumSize(new Dimension(600, 21));
-		panel2.add(proteinAbundanceChoice);
-		configPanel.add(panel2);
+		proteinAbundanceChoice.setFont(UIManager.getFont("Label.font"));
+		panel8.add(proteinAbundanceChoice);
+		panel3.add(panel8);
+		configPanel4.add(panel3);
 
-		label3.setText("Save results save as (prefix) ...");
-		label3.setLabelFor(resultChoice);
-		label3.setIcon(UIManager.getIcon("Tree.leafIcon"));
-		label3.setHorizontalAlignment(SwingConstants.LEFT);
-		label3.setAlignmentX(0.5F);
-		configPanel.add(label3);
+		panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
 
-		panel3.setBorder(new EmptyBorder(0, 15, 0, 0));
-		panel3.setLayout(new GridLayout());
+		advancedOption.setText("Advanced Options");
+		advancedOption.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
+		advancedOption.setFont(UIManager.getFont("Label.font"));
+		advancedOption.setToolTipText("Click to expand or collapse advanced options");
+		advancedOption.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				advancedOptionStateChanged(e);
+			}
+		});
+		panel4.add(advancedOption);
+		panel4.add(hSpacer1);
+		configPanel4.add(panel4);
 
-		resultChoice.setMinimumSize(new Dimension(10, 21));
-		resultChoice.setMaximumSize(new Dimension(600, 21));
-		resultChoice.setEditable(true);
-		panel3.add(resultChoice);
-		configPanel.add(panel3);
+		advancedOptionPanel.setLayout(new GridLayout(0, 1));
 
-		label7.setText("Perturbation type ...");
-		label7.setLabelFor(perturbationType);
-		label7.setIcon(UIManager.getIcon("Tree.leafIcon"));
-		label7.setHorizontalAlignment(SwingConstants.LEFT);
-		label7.setAlignmentX(0.5F);
-		configPanel.add(label7);
+		label10.setText("Save analysis results as");
+		label10.setIcon(UIManager.getIcon("Tree.leafIcon"));
+		label10.setHorizontalAlignment(SwingConstants.LEFT);
+		label10.setAlignmentX(0.5F);
+		label10.setFont(UIManager.getFont("Label.font"));
+		label10.setToolTipText("The result is stored as network attribute and node attributes, which can be exported by Cytoscape");
+		advancedOptionPanel.add(label10);
 
-		panel10.setBorder(new EmptyBorder(0, 15, 0, 0));
-		panel10.setLayout(new GridLayout());
+		panel12.setBorder(new EmptyBorder(0, 15, 0, 0));
+		panel12.setLayout(new GridLayout());
 
-		perturbationType.setMinimumSize(new Dimension(10, 21));
-		perturbationType.setMaximumSize(new Dimension(600, 21));
-		perturbationType.setModel(new DefaultComboBoxModel(new String[] {
-			"perturbate all proteins in same time",
-			"perturbate each protein at one time"
-		}));
-		perturbationType.setMaximumRowCount(20);
-		panel10.add(perturbationType);
-		configPanel.add(panel10);
+		resultName.setText("Auto Result.{CURRENT DATETIME}");
+		resultName.setForeground(Color.lightGray);
+		resultName.setFont(UIManager.getFont("Label.font"));
+		resultName.setToolTipText("The result is stored as network attribute and node attributes, which can be exported by Cytoscape");
+		resultName.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				resultNameFocusGained(e);
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+				resultNameFocusLost(e);
+			}
+		});
+		panel12.add(resultName);
+		advancedOptionPanel.add(panel12);
 
-		label5.setText("Set selected nodes change fold ...");
-		label5.setLabelFor(changeFoldChoice);
-		label5.setIcon(UIManager.getIcon("Tree.leafIcon"));
-		label5.setHorizontalAlignment(SwingConstants.LEFT);
-		label5.setAlignmentX(0.5F);
-		configPanel.add(label5);
+		label12.setText("Perturbation intensity (Change fold)");
+		label12.setLabelFor(changeFoldChoice);
+		label12.setIcon(UIManager.getIcon("Tree.leafIcon"));
+		label12.setHorizontalAlignment(SwingConstants.LEFT);
+		label12.setAlignmentX(0.5F);
+		label12.setFont(UIManager.getFont("Label.font"));
+		label12.setToolTipText("2 means double abundance change, and -2 means one half abundance change");
+		advancedOptionPanel.add(label12);
 
-		panel4.setBorder(new EmptyBorder(0, 15, 0, 0));
-		panel4.setLayout(new GridLayout());
+		panel14.setBorder(new EmptyBorder(0, 15, 0, 0));
+		panel14.setLayout(new GridLayout());
 
 		changeFoldChoice.setMinimumSize(new Dimension(10, 21));
 		changeFoldChoice.setMaximumSize(new Dimension(600, 21));
@@ -227,33 +371,69 @@ public class ControlPanel extends JPanel{
 		changeFoldChoice.setMaximumRowCount(20);
 		changeFoldChoice.setSelectedIndex(9);
 		changeFoldChoice.setEditable(true);
-		panel4.add(changeFoldChoice);
-		configPanel.add(panel4);
+		changeFoldChoice.setFont(UIManager.getFont("Label.font"));
+		changeFoldChoice.setToolTipText("2 means double abundance change, and -2 means one half abundance change");
+		panel14.add(changeFoldChoice);
+		advancedOptionPanel.add(panel14);
 
-		label8.setText("Iterative criteria ...");
-		label8.setIcon(UIManager.getIcon("Tree.leafIcon"));
-		label8.setHorizontalAlignment(SwingConstants.LEFT);
-		label8.setAlignmentX(0.5F);
-		label8.setToolTipText("Stop iteration when the residuals of the equations less than the iterative criteria");
-		configPanel.add(label8);
+		label14.setText("Dissociation constant (K, um/L) ");
+		label14.setIcon(UIManager.getIcon("Tree.leafIcon"));
+		label14.setHorizontalAlignment(SwingConstants.LEFT);
+		label14.setAlignmentX(0.5F);
+		label14.setToolTipText("The default value is suitable in most common cases");
+		label14.setFont(UIManager.getFont("Label.font"));
+		advancedOptionPanel.add(label14);
 
-		panel11.setBorder(new EmptyBorder(0, 15, 0, 0));
-		panel11.setLayout(new GridLayout());
+		panel16.setBorder(new EmptyBorder(0, 15, 0, 0));
+		panel16.setLayout(new GridLayout());
+
+		dissociationConstant.setText("MAX(Ci,Cj)/20");
+		dissociationConstant.setForeground(Color.lightGray);
+		dissociationConstant.setFont(UIManager.getFont("Label.font"));
+		dissociationConstant.setToolTipText("The default value is suitable in most common cases");
+		dissociationConstant.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				dissociationConstantFocusGained(e);
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+				dissociationConstantFocusLost(e);
+			}
+		});
+		panel16.add(dissociationConstant);
+		advancedOptionPanel.add(panel16);
+
+		label13.setText("Iterative criteria (EPS)");
+		label13.setIcon(UIManager.getIcon("Tree.leafIcon"));
+		label13.setHorizontalAlignment(SwingConstants.LEFT);
+		label13.setAlignmentX(0.5F);
+		label13.setToolTipText("Stop iteration when the residuals of the equations less than the iterative criteria");
+		label13.setFont(UIManager.getFont("Label.font"));
+		advancedOptionPanel.add(label13);
+
+		panel15.setBorder(new EmptyBorder(0, 15, 0, 0));
+		panel15.setLayout(new GridLayout());
 
 		iterativeCriteria.setText("1e-10");
-		panel11.add(iterativeCriteria);
-		configPanel.add(panel11);
-		add(configPanel);
+		iterativeCriteria.setFont(UIManager.getFont("Label.font"));
+		iterativeCriteria.setToolTipText("Stop iteration when the residuals of the equations less than the iterative criteria");
+		panel15.add(iterativeCriteria);
+		advancedOptionPanel.add(panel15);
+		configPanel4.add(advancedOptionPanel);
+		add(configPanel4);
 
 		configPanel2.setBorder(new CompoundBorder(
 			new TitledBorder("Model Calculation"),
 			new EmptyBorder(5, 5, 5, 5)));
+		configPanel2.setFont(UIManager.getFont("Label.font"));
 		configPanel2.setLayout(new GridLayout(0, 1, 5, 5));
 
-		label2.setText("Start calculation for selected protein...");
+		label2.setText("Start calculation for selected protein(s) ...");
 		label2.setIcon(UIManager.getIcon("Tree.leafIcon"));
 		label2.setHorizontalAlignment(SwingConstants.LEFT);
 		label2.setAlignmentX(0.5F);
+		label2.setFont(UIManager.getFont("Label.font"));
 		configPanel2.add(label2);
 
 		panel7.setBorder(new EmptyBorder(0, 15, 0, 0));
@@ -261,44 +441,10 @@ public class ControlPanel extends JPanel{
 
 		startCalculate.setText("Calculate");
 		startCalculate.setAlignmentX(0.5F);
+		startCalculate.setFont(UIManager.getFont("Button.font"));
 		panel7.add(startCalculate);
 		configPanel2.add(panel7);
 		add(configPanel2);
-
-		configPanel3.setBorder(new CompoundBorder(
-			new TitledBorder("Model Analysis"),
-			new EmptyBorder(5, 5, 5, 5)));
-		configPanel3.setLayout(new GridLayout(0, 1, 5, 5));
-
-		label6.setText("Saved results (prefix) ...");
-		label6.setLabelFor(resultAnalyseChoice);
-		label6.setIcon(UIManager.getIcon("Tree.leafIcon"));
-		label6.setHorizontalAlignment(SwingConstants.LEFT);
-		label6.setAlignmentX(0.5F);
-		configPanel3.add(label6);
-
-		panel5.setBorder(new EmptyBorder(0, 15, 0, 0));
-		panel5.setLayout(new GridLayout());
-
-		resultAnalyseChoice.setMinimumSize(new Dimension(10, 21));
-		resultAnalyseChoice.setMaximumSize(new Dimension(600, 21));
-		panel5.add(resultAnalyseChoice);
-		configPanel3.add(panel5);
-
-		label4.setText("Start analysis & visualize ...");
-		label4.setIcon(UIManager.getIcon("Tree.leafIcon"));
-		label4.setHorizontalAlignment(SwingConstants.LEFT);
-		label4.setAlignmentX(0.5F);
-		configPanel3.add(label4);
-
-		panel9.setBorder(new EmptyBorder(0, 15, 0, 0));
-		panel9.setLayout(new GridLayout());
-
-		startAnalysis.setText("Analyse");
-		startAnalysis.setAlignmentX(0.5F);
-		panel9.add(startAnalysis);
-		configPanel3.add(panel9);
-		add(configPanel3);
 
 		panel1.setLayout(new BorderLayout());
 
@@ -323,21 +469,34 @@ public class ControlPanel extends JPanel{
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	// Generated using JFormDesigner Open Source Project license - unknown
 	private JPanel panel2;
-	public JComboBox proteinAbundanceChoice;
+	public JRadioButton singleMode;
+	private JPanel panel18;
+	private JTextArea textArea2;
+	private JPanel panel5;
+	private JRadioButton batchMode;
+	private JPanel panel17;
+	private JTextArea textArea3;
+	private JPanel configPanel4;
 	private JPanel panel3;
-	public JComboBox resultChoice;
-	private JPanel panel10;
-	public JComboBox perturbationType;
+	private JPanel panel8;
+	public JComboBox proteinAbundanceChoice;
 	private JPanel panel4;
+	private JCheckBox advancedOption;
+	private JPanel hSpacer1;
+	private JPanel advancedOptionPanel;
+	private JPanel panel12;
+	private JTextField resultName;
+	private JLabel label12;
+	private JPanel panel14;
 	public JComboBox changeFoldChoice;
-	private JPanel panel11;
+	private JLabel label14;
+	private JPanel panel16;
+	public JTextField dissociationConstant;
+	private JLabel label13;
+	private JPanel panel15;
 	public JTextField iterativeCriteria;
 	private JPanel panel7;
 	public JButton startCalculate;
-	private JPanel panel5;
-	public JComboBox resultAnalyseChoice;
-	private JPanel panel9;
-	public JButton startAnalysis;
 	private JPanel panel1;
 	private JScrollPane scrollPane1;
 	public JTextArea infoText;
