@@ -21,32 +21,13 @@ package dynamic;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Vector;
-
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 /*
  * Created by JFormDesigner on Thu Mar 12 15:15:39 CST 2009
- */
-
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.statistics.HistogramDataset; 
+ */ 
 
 
 
@@ -62,6 +43,7 @@ public class ResultPanel extends JPanel {
 		perturbation = p;
 		freeConcentrations = fc;
 		setName(freeConcentrations);
+		cutoffSliderStateChanged(null);
 	}
 
 	private void cutoffSliderStateChanged(ChangeEvent e) {
@@ -74,8 +56,9 @@ public class ResultPanel extends JPanel {
 		perturbation.highlightSubnetwork(model, freeConcentrations, cutoffSlider.getValue()/100.0D, true);
 	}
 
-
-	
+	private void unhighlightButtonActionPerformed(ActionEvent e) {
+		// TODO add your code here
+	}
 
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -85,11 +68,13 @@ public class ResultPanel extends JPanel {
 		panel2 = new JPanel();
 		panel4 = new JPanel();
 		label1 = new JLabel();
+		panel3 = new JPanel();
 		highlightButton = new JButton();
+		unhighlightButton = new JButton();
 		cutoffSlider = new JSlider();
 		scrollPane1 = new JScrollPane();
 		subnetInfo = new JTable();
-		splitRightPane = new JSplitPane();
+		rightPane = new JTabbedPane();
 
 		setLayout(new BorderLayout());
 
@@ -105,20 +90,31 @@ public class ResultPanel extends JPanel {
 		label1.setLabelFor(cutoffSlider);
 		panel4.add(label1, BorderLayout.CENTER);
 
+		panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
+
 		highlightButton.setText("Highlight");
 		highlightButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				highlightButtonActionPerformed(e);
 			}
 		});
-		panel4.add(highlightButton, BorderLayout.EAST);
+		panel3.add(highlightButton);
+
+		unhighlightButton.setText("Unhighlight");
+		unhighlightButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				unhighlightButtonActionPerformed(e);
+			}
+		});
+		panel3.add(unhighlightButton);
+		panel4.add(panel3, BorderLayout.EAST);
 		panel2.add(panel4);
 
 		cutoffSlider.setMinorTickSpacing(1);
 		cutoffSlider.setPaintTicks(true);
 		cutoffSlider.setPaintLabels(true);
 		cutoffSlider.setMajorTickSpacing(10);
-		cutoffSlider.setValue(0);
+		cutoffSlider.setValue(20);
 		cutoffSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				cutoffSliderStateChanged(e);
@@ -156,8 +152,8 @@ public class ResultPanel extends JPanel {
 		panel1.add(panel2, BorderLayout.CENTER);
 		splitPane.setLeftComponent(panel1);
 
-		splitRightPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		splitPane.setRightComponent(splitRightPane);
+		rightPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+		splitPane.setRightComponent(rightPane);
 		add(splitPane, BorderLayout.CENTER);
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
@@ -169,10 +165,12 @@ public class ResultPanel extends JPanel {
 	private JPanel panel2;
 	private JPanel panel4;
 	private JLabel label1;
+	private JPanel panel3;
 	private JButton highlightButton;
+	private JButton unhighlightButton;
 	private JSlider cutoffSlider;
 	private JScrollPane scrollPane1;
 	private JTable subnetInfo;
-	public JSplitPane splitRightPane;
+	public JTabbedPane rightPane;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

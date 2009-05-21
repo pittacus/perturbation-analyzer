@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<project default="release">
+	<propertyfile file="./build.properties">
+		<entry key="major.number" type="int" value="0"/>
+		<entry key="minor.number" type="int" value="2"/>
+		<entry key="build.number" type="int" operation="+" value="1" pattern="00"/>
+	    </propertyfile>
+	<property file="./build.properties"/>
+	<echo message= "Build ${major.number}.${minor.number}.${build.number}"/>
+	
+    <property name="src.dir"     value="src"/>
+    <property name="bin.dir"     value="bin"/>
+	<property name="jar.dir"     value="release"/>
+	<property name="release.dir"     value="../cytoscape-v2.6.2/plugins"/>
+
+	<property name="version"     value="${major.number}.${minor.number}.${build.number}"/>
+	<property name="jarfile"     value="${jar.dir}/PerturbationAnalyzer.v${version}.jar"/>
+    <property name="main-class"  value="dynamic.Perturbation"/>
+
+   	<manifest file="MANIFEST.MF">
+	    <attribute name="Manifest-Version" value="${version}"/>
+	    <attribute name="Created-By" value="pittacus@gmail.com"/>
+	    <attribute name="Cytoscape-Plugin" value="${main-class}"/>
+  	</manifest>
+	
+   <target name="compile" description="Compilation target">
+        <javac srcdir="${src.dir}" destdir="${bin.dir}"/>
+    </target>
+	
+
+  	<target name="compress" depends="compile" description="Compression target">
+        <jar jarfile="${jarfile}" manifest="MANIFEST.MF">
+		    <fileset dir="${bin.dir}" includes="dynamic/*.class"/>
+		    <fileset dir="${src.dir}" includes="dynamic/plugin.props"/>
+		    <fileset dir="." includes="COPYING,NOTICE"/>
+		</jar>
+  	</target>
+
+  	<target name="release" depends="compress" description="Release jar">
+  		<delete>
+  		    <fileset dir="${release.dir}" includes="PerturbationAnalyzer*.jar"/>
+  		</delete>
+  		<copy file="${jarfile}" todir="${release.dir}"/>
+  	</target>
+</project>

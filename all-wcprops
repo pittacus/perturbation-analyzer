@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 21
+/svn/!svn/ver/1/trunk
+END
+NOTICE
+K 25
+svn:wc:ra_dav:version-url
+V 28
+/svn/!svn/ver/2/trunk/NOTICE
+END
+build.bat
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/!svn/ver/3/trunk/build.bat
+END
+MANIFEST.MF
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/3/trunk/MANIFEST.MF
+END
+COPYING
+K 25
+svn:wc:ra_dav:version-url
+V 29
+/svn/!svn/ver/2/trunk/COPYING
+END
