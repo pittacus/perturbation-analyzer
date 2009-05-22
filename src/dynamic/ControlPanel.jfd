@@ -708,7 +708,7 @@
               </void> 
               <void method="setProperty"> 
                <string>selectedIndex</string> 
-               <int>9</int> 
+               <int>8</int> 
               </void> 
               <void method="setProperty"> 
                <string>editable</string> 

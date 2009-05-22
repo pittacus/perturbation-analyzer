@@ -1,0 +1,21 @@
+   Authors:   pittacus@gmail.com (Fei Li)
+
+   This project is for PerturbationAnalyzer.
+
+INTRODUCTION
+
+   PerturbationAnalyzer is an open-source plugin for Cytoscape to 
+quantitatively analyze the dynamic characteristics of protein-protein 
+interaction network. This tool automatically evaluates the propagation effects 
+of single perturbation or combinatorial perturba-tions of protein 
+concentrations by comparing two different equilib-rium states which governed by 
+the law of mass action (LMA). With Cytoscape visualization environment, the 
+results are represented visually in an intuitive and customizable way to help 
+identify the key proteins which is mostly perturbed or has largest propagation 
+scope. The results can be saved or exported into standard format for further 
+analysis.
+
+DEPENDENCY
+
+    Cytoscape program directory should be placed into the root directory of 
+project. The Ant script build.xml containds all the build details.

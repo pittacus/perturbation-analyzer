@@ -258,8 +258,8 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 				output.tabbedPane.remove(c);
 			}
 		}
-		ResultPanel panel = new ResultPanel(this, name);
-		output.tabbedPane.add(parameter.result, panel);
+		ResultPanel panel = new ResultPanel(this, parameter);
+		output.tabbedPane.add(name, panel);
 
 		{
 			double fold[]=getDoubleAttribute(map, name+Config.SUFFIX_SUBNET_SIZE);
@@ -288,6 +288,9 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 
 		highlightNodes(map,sel);
 
+		log("analyse end ["+network.getTitle()+","+name+"]");
+		if(true) return;
+		
 		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
 		NodeAppearanceCalculator nac = manager.getVisualStyle()
 		.getNodeAppearanceCalculator();
@@ -321,7 +324,7 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 				output.tabbedPane.remove(c);
 			}
 		}
-		ResultPanel panel = new ResultPanel(this, name);
+		ResultPanel panel = new ResultPanel(this, parameter);
 		output.tabbedPane.add(parameter.result, panel);
 
 		{
@@ -597,7 +600,7 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 		}
 	}
 
-	public void highlightSubnetwork(DefaultTableModel model, String freeConcentrations, double cutoff, boolean highlightNetwork) {
+	public void highlightSubnetwork(DefaultTableModel model, Parameter parameter, double cutoff, boolean highlightNetwork) {
 		DecimalFormat formatter = new DecimalFormat("0.##");
 
 		model.setValueAt(cutoff, 0, 1);
@@ -607,10 +610,21 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 		CyAttributes attributes = Cytoscape.getNodeAttributes();
 
 		int n = network.getNodeCount();
-
+		String name = parameter.result;
+		
 		Map map=buildMap();
-		double fold[]=getDoubleAttribute(map, freeConcentrations+".fold");
-		boolean sel[]=getBooleanAttribute(map, freeConcentrations+".select");
+
+		double fold[];
+		if(parameter.perturbationType==Config.PERTURBATION_SINGLE)
+			fold=getDoubleAttribute(map, name+Config.SUFFIX_FOLD);
+		else if(parameter.perturbationType==Config.PERTURBATION_BATCH)
+			fold=getDoubleAttribute(map, name+Config.SUFFIX_SUBNET_SIZE);
+		else
+		{
+			alert("Invalid perturbationType!");
+			return;
+		}
+		boolean sel[]=getBooleanAttribute(map, name+Config.SUFFIX_SELECT);
 
 		SortedMap subnodes = new TreeMap(); 
 
@@ -882,11 +896,16 @@ class Worker implements Task {
 		int[][] s = perturbation.getAdjacentMatrix(map);
 
 		// calc
-		double[] fc_before = maslov("Calulate fc before perturbation", tc, s);
+		double[] fc_before = maslov("Calulate original fc before perturbation", tc, s);
 
 		double[] subnet_size= new double[n];
 		boolean[] sel = new boolean[n];
+
+		perturbation.log("Select " + network.getSelectedNodes().size() + " Node(s)");
+		
+		int count=0;
 		for (Object selectedNode : network.getSelectedNodes()) {
+			count++;
 			idx = (Integer) map.get(((CyNode) selectedNode).getIdentifier());
 			double tc0 = tc[idx];
 			sel[idx]=true;
@@ -896,7 +915,7 @@ class Worker implements Task {
 			else if(changeFold<0)
 				tc[idx] /= (-changeFold);
 
-			double[] fc_after = maslov("Calulate fc after perturbation", tc, s);
+			double[] fc_after = maslov("Calulate "+ count +"th fc after perturbation", tc, s);
 
 			double fc_fold=0;
 			for (int k = 0; k < n; k++) {
@@ -910,7 +929,6 @@ class Worker implements Task {
 
 			tc[idx]=tc0;
 		}
-		perturbation.log("Select Nodes: " + network.getSelectedNodes().size());
 
 		// write back
 		perturbation.setAttribute(map, name + Config.SUFFIX_SUBNET_SIZE, subnet_size);
@@ -944,7 +962,7 @@ class Worker implements Task {
 				tc[idx] /= (-changeFold);
 			sel[idx]=true;
 		}
-		perturbation.log("Select Nodes: " + network.getSelectedNodes().size());
+		perturbation.log("Select " + network.getSelectedNodes().size() + "Node(s)");
 
 		double[] fc_after = maslov("Calulate fc after perturbation", tc, s);
 

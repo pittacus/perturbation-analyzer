@@ -37,23 +37,24 @@ import javax.swing.table.*;
 public class ResultPanel extends JPanel {
 	Perturbation perturbation;
 	String freeConcentrations;
+	Parameter parameter;
 	
-	public ResultPanel(Perturbation p, String fc) {
+	public ResultPanel(Perturbation p, Parameter para) {
 		initComponents();
 		perturbation = p;
-		freeConcentrations = fc;
-		setName(freeConcentrations);
+		parameter = para;
+		setName(parameter.result);
 		cutoffSliderStateChanged(null);
 	}
 
 	private void cutoffSliderStateChanged(ChangeEvent e) {
 		DefaultTableModel model = (DefaultTableModel) subnetInfo.getModel();
-		perturbation.highlightSubnetwork(model, freeConcentrations, cutoffSlider.getValue()/100.0D, false);
+		perturbation.highlightSubnetwork(model, parameter, cutoffSlider.getValue()/100.0D, false);
 	}
 
 	private void highlightButtonActionPerformed(ActionEvent e) {
 		DefaultTableModel model = (DefaultTableModel) subnetInfo.getModel();
-		perturbation.highlightSubnetwork(model, freeConcentrations, cutoffSlider.getValue()/100.0D, true);
+		perturbation.highlightSubnetwork(model, parameter, cutoffSlider.getValue()/100.0D, true);
 	}
 
 	private void unhighlightButtonActionPerformed(ActionEvent e) {

@@ -369,7 +369,7 @@ public class ControlPanel extends JPanel{
 			"-10"
 		}));
 		changeFoldChoice.setMaximumRowCount(20);
-		changeFoldChoice.setSelectedIndex(9);
+		changeFoldChoice.setSelectedIndex(8);
 		changeFoldChoice.setEditable(true);
 		changeFoldChoice.setFont(UIManager.getFont("Label.font"));
 		changeFoldChoice.setToolTipText("2 means double abundance change, and -2 means one half abundance change");
