@@ -2,19 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/cytoscape.jar"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-cruft-obo.jar"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-geom-rtree.jar"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-geom-spacial.jar"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-graph-dynamic.jar"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-graph-fixed.jar"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-render-export.jar"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-render-immed.jar"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-render-stateful.jar"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-task.jar"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/cytoscape-util-intr.jar"/>
-	<classpathentry kind="lib" path="../cytoscape-v2.6.2/lib/giny.jar"/>
-	<classpathentry kind="lib" path="lib/jfreechart-1.0.12.jar"/>
+	<classpathentry kind="lib" path="M:/Work/Cytoscape plugin/cytoscape-v2.6.2/cytoscape.jar"/>
+	<classpathentry kind="lib" path="M:/Work/Cytoscape plugin/cytoscape-v2.6.2/lib/giny.jar"/>
+	<classpathentry kind="lib" path="M:/Work/Cytoscape plugin/cytoscape-v2.6.2/lib/cytoscape-task.jar"/>
 	<classpathentry kind="lib" path="lib/jcommon-1.0.15.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart-1.0.12.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

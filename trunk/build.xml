@@ -45,7 +45,7 @@
             	<pathelement location="lib/jcommon-1.0.15.jar"/>
             </classpath>
         </javac>
-    </target>
+   </target>
 	
   	<target name="compress" depends="compile" description="Compression target">
         <jar jarfile="${jarfile}" manifest="MANIFEST.MF">
@@ -60,5 +60,6 @@
   		    <fileset dir="${release.dir}" includes="PerturbationAnalyzer*.jar"/>
   		</delete>
   		<copy file="${jarfile}" todir="${release.dir}"/>
-  	</target>
+  		<echo message= "Build complete"/>
+ 	</target>
 </project>
