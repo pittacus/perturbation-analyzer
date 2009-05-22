@@ -266,6 +266,27 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 
 			int i, j;
 			for (i = j = 0; j < fold.length; ++j){
+				if (sel[j]) fold[i++] = fold[j];
+			}
+			fold = Arrays.copyOf(fold, i);
+
+			HistogramDataset histogramdataset = new HistogramDataset(); 
+			histogramdataset.addSeries("", fold, 100); 
+
+			JFreeChart jfreechart = ChartFactory.createHistogram(
+					"Histogram of Subgroup Sizes of Source Proteins",
+					null, null, 
+					histogramdataset, PlotOrientation.VERTICAL,
+					false, false, false); 
+			jfreechart.getXYPlot().setForegroundAlpha(0.75F); 
+
+			panel.rightPane.add(jfreechart.getTitle().getText(), new ChartPanel(jfreechart));
+		}
+		{
+			double fold[]=getDoubleAttribute(map, name+Config.SUFFIX_SUBNET_SIZE);
+
+			int i, j;
+			for (i = j = 0; j < fold.length; ++j){
 				if (!sel[j]) fold[i++] = fold[j];
 			}
 			fold = Arrays.copyOf(fold, i);
@@ -274,7 +295,7 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 			histogramdataset.addSeries("", fold, 100); 
 
 			JFreeChart jfreechart = ChartFactory.createHistogram(
-					"Histogram of Other Protein SubNet Size",
+					"Histogram of Subgroup Sizes of Other Proteins",
 					null, null, 
 					histogramdataset, PlotOrientation.VERTICAL,
 					false, false, false); 
@@ -285,7 +306,7 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 
 		panel.splitPane.setOneTouchExpandable(true);
 		panel.splitPane.setResizeWeight(0.5);
-
+		panel.splitPane.getLeftComponent().setVisible(false);
 		highlightNodes(map,sel);
 
 		log("analyse end ["+network.getTitle()+","+name+"]");
@@ -341,7 +362,7 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 			histogramdataset.addSeries("", fold, 100); 
 
 			JFreeChart jfreechart = ChartFactory.createHistogram(
-					"Histogram of Source Protein Fold Change",
+					"Histogram of Fold Changes of Source Proteins",
 					null, null, 
 					histogramdataset, PlotOrientation.VERTICAL,
 					false, false, false); 
@@ -362,7 +383,7 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 			histogramdataset.addSeries("", fold, 100); 
 
 			JFreeChart jfreechart = ChartFactory.createHistogram(
-					"Histogram of Other Protein Fold Change",
+					"Histogram of Fold Changes of Other Proteins",
 					null, null, 
 					histogramdataset, PlotOrientation.VERTICAL,
 					false, false, false); 
@@ -919,11 +940,17 @@ class Worker implements Task {
 
 			double fc_fold=0;
 			for (int k = 0; k < n; k++) {
-				fc_fold = (fc_before[k] != 0 ? fc_after[k]
-				                                        / fc_before[k] : Double.NaN);
-				//				TODO changeFold threshold
-				if(fc_fold>0.2D){
+				if(Math.abs(fc_before[k])<1e-10){
 					subnet_size[idx]++;
+				}
+				else
+				{
+					fc_fold = (fc_before[k] != 0 ? 
+							fc_after[k] / fc_before[k] : Double.NaN);
+				//				TODO changeFold threshold
+					if(Math.abs(fc_fold-1)>0.2D){
+						subnet_size[idx]++;
+					}
 				}
 			}
 
