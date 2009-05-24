@@ -940,7 +940,7 @@ class Worker implements Task {
 
 			double fc_fold=0;
 			for (int k = 0; k < n; k++) {
-				if(Math.abs(fc_before[k])<1e-10){
+				if(Math.abs(fc_before[k])<1e-10 && Math.abs(fc_after[k])>1e-10){
 					subnet_size[idx]++;
 				}
 				else
