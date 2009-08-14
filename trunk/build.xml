@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <project default="release">
 	<propertyfile file="./build.properties">
-		<entry key="major.number" type="int" value="0"/>
-		<entry key="minor.number" type="int" value="2"/>
+		<entry key="major.number" type="int" value="1"/>
+		<entry key="minor.number" type="int" value="0"/>
 		<entry key="build.number" type="int" operation="+" value="1" pattern="00"/>
 	    </propertyfile>
 	<property file="./build.properties"/>
@@ -31,7 +31,9 @@
             <classpath>
               <pathelement path="${classpath}"/>
             	<pathelement location="${cytoscape.dir}/cytoscape.jar"/>
-            	<pathelement location="${cytoscape.dir}/giny"/>
+            	<pathelement location="${cytoscape.dir}/lib/giny.jar"/>
+             	<pathelement location="${cytoscape.dir}/cytoscape-render-stateful.jar"/>
+           	<pathelement location="${cytoscape.dir}/lib/ding.jar"/>
             	<pathelement location="lib/jfreechart-1.0.12.jar"/>
             	<pathelement location="lib/jcommon-1.0.15.jar"/>
             </classpath>
@@ -42,6 +44,7 @@
         <jar jarfile="${jarfile}" manifest="MANIFEST.MF">
 		    <fileset dir="${bin.dir}" includes="dynamic/*.class"/>
 		    <fileset dir="${src.dir}" includes="dynamic/plugin.props"/>
+		    <fileset dir="release/lib" includes="*/"/>
 		    <fileset dir="." includes="COPYING,NOTICE"/>
 		</jar>
   	</target>

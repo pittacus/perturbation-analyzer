@@ -81,35 +81,6 @@
                <string>panel4</string> 
               </void> 
               <void method="add"> 
-               <object class="com.jformdesigner.model.FormComponent"> 
-                <string>javax.swing.JLabel</string> 
-                <void method="setProperty"> 
-                 <string>text</string> 
-                 <string>Subgroup threshold (%)</string> 
-                </void> 
-                <void method="setProperty"> 
-                 <string>labelFor</string> 
-                 <object class="com.jformdesigner.model.FormReference"> 
-                  <string>cutoffSlider</string> 
-                 </object> 
-                </void> 
-                <void method="setProperty"> 
-                 <string>toolTipText</string> 
-                 <string>Filter the nodes by the change rates &gt; threshold</string> 
-                </void> 
-                <void property="name"> 
-                 <string>label1</string> 
-                </void> 
-               </object> 
-               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-                <class>java.lang.String</class> 
-                <void method="setProperty"> 
-                 <string>value</string> 
-                 <string>Center</string> 
-                </void> 
-               </object> 
-              </void> 
-              <void method="add"> 
                <object class="com.jformdesigner.model.FormContainer"> 
                 <string>javax.swing.JPanel</string> 
                 <object class="com.jformdesigner.model.FormLayoutManager"> 
@@ -122,54 +93,6 @@
                 <void property="name"> 
                  <string>panel3</string> 
                 </void> 
-                <void method="add"> 
-                 <object class="com.jformdesigner.model.FormComponent"> 
-                  <string>javax.swing.JButton</string> 
-                  <void method="setProperty"> 
-                   <string>text</string> 
-                   <string>Highlight all nodes in subgroup</string> 
-                  </void> 
-                  <void property="name"> 
-                   <string>highlightButton</string> 
-                  </void> 
-                  <void method="addEvent"> 
-                   <object class="com.jformdesigner.model.FormEvent"> 
-                    <string>java.awt.event.ActionListener</string> 
-                    <string>actionPerformed</string> 
-                    <string>highlightButtonActionPerformed</string> 
-                    <boolean>true</boolean> 
-                   </object> 
-                  </void> 
-                 </object> 
-                </void> 
-                <void method="add"> 
-                 <object class="com.jformdesigner.model.FormComponent"> 
-                  <string>com.jformdesigner.designer.wrapper.HSpacer</string> 
-                  <void property="name"> 
-                   <string>hSpacer1</string> 
-                  </void> 
-                 </object> 
-                </void> 
-                <void method="add"> 
-                 <object class="com.jformdesigner.model.FormComponent"> 
-                  <string>javax.swing.JButton</string> 
-                  <void method="setProperty"> 
-                   <string>text</string> 
-                   <string>Create subgroup view</string> 
-                  </void> 
-                  <void property="name"> 
-                   <string>createSubgroupButton</string> 
-                  </void> 
-                  <void method="addEvent"> 
-                   <object class="com.jformdesigner.model.FormEvent"> 
-                    <string>java.awt.event.ActionListener</string> 
-                    <string>actionPerformed</string> 
-                    <string>createSubgroupButtonActionPerformed</string> 
-                    <boolean>true</boolean> 
-                   </object> 
-                  </void> 
-                 </object> 
-                </void> 
                </object> 
                <object class="com.jformdesigner.model.FormLayoutConstraints"> 
                 <class>java.lang.String</class> 
@@ -177,42 +100,6 @@
                  <string>value</string> 
                  <string>East</string> 
                 </void> 
-               </object> 
-              </void> 
-             </object> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JSlider</string> 
-              <void method="setProperty"> 
-               <string>minorTickSpacing</string> 
-               <int>1</int> 
-              </void> 
-              <void method="setProperty"> 
-               <string>paintTicks</string> 
-               <boolean>true</boolean> 
-              </void> 
-              <void method="setProperty"> 
-               <string>paintLabels</string> 
-               <boolean>true</boolean> 
-              </void> 
-              <void method="setProperty"> 
-               <string>majorTickSpacing</string> 
-               <int>10</int> 
-              </void> 
-              <void method="setProperty"> 
-               <string>value</string> 
-               <int>20</int> 
-              </void> 
-              <void property="name"> 
-               <string>cutoffSlider</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>javax.swing.event.ChangeListener</string> 
-                <string>stateChanged</string> 
-                <string>cutoffSliderStateChanged</string> 
-                <boolean>true</boolean> 
                </object> 
               </void> 
              </object> 
@@ -246,27 +133,27 @@
                    <void method="add"> 
                     <object class="java.util.Vector"> 
                      <void method="add"> 
-                      <string>Disturbed subgroup size</string> 
+                      <string>Total proteins</string> 
                      </void> 
                      <void method="add"> 
-                      <string>2</string> 
-                     </void> 
-                    </object> 
-                   </void> 
-                   <void method="add"> 
-                    <object class="java.util.Vector"> 
-                     <void method="add"> 
-                      <string>Average of change ratios</string> 
-                     </void> 
-                     <void method="add"> 
-                      <string>1.23</string> 
+                      <string></string> 
                      </void> 
                     </object> 
                    </void> 
                    <void method="add"> 
                     <object class="java.util.Vector"> 
                      <void method="add"> 
-                      <string>Maximum of change ratios</string> 
+                      <string>Average of subgroup sizes</string> 
+                     </void> 
+                     <void method="add"> 
+                      <string></string> 
+                     </void> 
+                    </object> 
+                   </void> 
+                   <void method="add"> 
+                    <object class="java.util.Vector"> 
+                     <void method="add"> 
+                      <string>Maximum of subgroup sizes</string> 
                      </void> 
                      <void method="add"> 
                       <null/> 
@@ -276,7 +163,7 @@
                    <void method="add"> 
                     <object class="java.util.Vector"> 
                      <void method="add"> 
-                      <string>Minimum of change ratios</string> 
+                      <string>Minimum of subgroup sizes</string> 
                      </void> 
                      <void method="add"> 
                       <null/> 
@@ -289,7 +176,7 @@
                       <string>--- Protein list ---</string> 
                      </void> 
                      <void method="add"> 
-                      <string>--- Change ratio ---</string> 
+                      <string>--- Subgroup size ---</string> 
                      </void> 
                     </object> 
                    </void> 
@@ -369,7 +256,7 @@
            <string>border</string> 
            <object class="javax.swing.border.TitledBorder"> 
             <null/> 
-            <string>Distribution of Change Ratios of Disturbed Proteins [Source Excluded]</string> 
+            <string>Distribution of Disturbed Subgroup Sizes</string> 
             <int>4</int> 
             <int>0</int> 
             <null/> 

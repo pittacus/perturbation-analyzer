@@ -160,8 +160,7 @@
               </void> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>1. Perturbate all proteins in same time
-2. Propagation analysis in one perturbation</string> 
+               <string>All selected nodes perturbated at the same time</string> 
               </void> 
               <void method="setProperty"> 
                <string>font</string> 
@@ -245,8 +244,7 @@
               </void> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>1. Perturbate one protein at a time
-2. Propagation analysis for many perturbations</string> 
+               <string>One selected node perturbated at a time</string> 
               </void> 
               <void method="setProperty"> 
                <string>font</string> 
@@ -323,7 +321,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Select total protein concentration</string> 
+             <string>Select total concentration</string> 
             </void> 
             <void method="setProperty"> 
              <string>labelFor</string> 
@@ -490,7 +488,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Save analysis results as</string> 
+             <string>Analysis result name</string> 
             </void> 
             <void method="setProperty"> 
              <string>icon</string> 
@@ -541,7 +539,7 @@
               <string>javax.swing.JTextField</string> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>Auto Result.{CURRENT DATETIME}</string> 
+               <string>Perturbation.result.{CURRENT DATETIME}</string> 
               </void> 
               <void method="setProperty"> 
                <string>foreground</string> 
@@ -744,7 +742,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Dissociation constant (K, um/L) </string> 
+             <string>Dissociation constant K (nM) </string> 
             </void> 
             <void method="setProperty"> 
              <string>icon</string> 
@@ -768,6 +766,82 @@
             </void> 
             <void property="name"> 
              <string>label14</string> 
+            </void> 
+           </object> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormContainer"> 
+            <string>javax.swing.JPanel</string> 
+            <object class="com.jformdesigner.model.FormLayoutManager"> 
+             <class>java.awt.GridLayout</class> 
+            </object> 
+            <void method="setProperty"> 
+             <string>border</string> 
+             <object idref="EmptyBorder1"/> 
+            </void> 
+            <void property="name"> 
+             <string>panel20</string> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JComboBox</string> 
+              <void method="setProperty"> 
+               <string>foreground</string> 
+               <object class="java.awt.Color" field="lightGray"/> 
+              </void> 
+              <void method="setProperty"> 
+               <string>font</string> 
+               <object idref="SwingFont0"/> 
+              </void> 
+              <void method="setProperty"> 
+               <string>toolTipText</string> 
+               <string>The default value is suitable in most common cases</string> 
+              </void> 
+              <void method="setProperty"> 
+               <string>model</string> 
+               <object class="javax.swing.DefaultComboBoxModel"> 
+                <void property="selectedItem"> 
+                 <string>MAX(Ci, Cj)/20</string> 
+                </void> 
+                <void method="addElement"> 
+                 <string>MAX(Ci, Cj)/20</string> 
+                </void> 
+                <void method="addElement"> 
+                 <string>1</string> 
+                </void> 
+                <void method="addElement"> 
+                 <string>10</string> 
+                </void> 
+                <void method="addElement"> 
+                 <string>100</string> 
+                </void> 
+                <void method="addElement"> 
+                 <string>1000</string> 
+                </void> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>editable</string> 
+               <boolean>true</boolean> 
+              </void> 
+              <void property="name"> 
+               <string>dissociationConstant2</string> 
+              </void> 
+              <void method="auxiliary"> 
+               <void method="setProperty"> 
+                <string>JavaCodeGenerator.variableModifiers</string> 
+                <int>1</int> 
+               </void> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ItemListener</string> 
+                <string>itemStateChanged</string> 
+                <string>dissociationConstant2ItemStateChanged</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+             </object> 
             </void> 
            </object> 
           </void> 
@@ -905,6 +979,79 @@
             </void> 
            </object> 
           </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JLabel</string> 
+            <void method="setProperty"> 
+             <string>text</string> 
+             <string>Subgroup threshold (%)</string> 
+            </void> 
+            <void method="setProperty"> 
+             <string>icon</string> 
+             <object idref="SwingIcon0"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>horizontalAlignment</string> 
+             <int>2</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>alignmentX</string> 
+             <float>0.5</float> 
+            </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>These nodes with change rate &gt; threshold are considered disturbed</string> 
+            </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object idref="SwingFont0"/> 
+            </void> 
+            <void property="name"> 
+             <string>label16</string> 
+            </void> 
+           </object> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormContainer"> 
+            <string>javax.swing.JPanel</string> 
+            <object class="com.jformdesigner.model.FormLayoutManager"> 
+             <class>java.awt.GridLayout</class> 
+            </object> 
+            <void method="setProperty"> 
+             <string>border</string> 
+             <object idref="EmptyBorder1"/> 
+            </void> 
+            <void property="name"> 
+             <string>panel19</string> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JTextField</string> 
+              <void method="setProperty"> 
+               <string>text</string> 
+               <string>20</string> 
+              </void> 
+              <void method="setProperty"> 
+               <string>font</string> 
+               <object idref="SwingFont0"/> 
+              </void> 
+              <void method="setProperty"> 
+               <string>toolTipText</string> 
+               <string>Stop iteration when the residuals of the equations less than the iterative criteria</string> 
+              </void> 
+              <void property="name"> 
+               <string>disturbedThreshold</string> 
+              </void> 
+              <void method="auxiliary"> 
+               <void method="setProperty"> 
+                <string>JavaCodeGenerator.variableModifiers</string> 
+                <int>1</int> 
+               </void> 
+              </void> 
+             </object> 
+            </void> 
+           </object> 
+          </void> 
          </object> 
         </void> 
        </object> 
@@ -1010,7 +1157,7 @@
             <string>javax.swing.JButton</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Calculate</string> 
+             <string>Start Analysis</string> 
             </void> 
             <void method="setProperty"> 
              <string>alignmentX</string> 
@@ -1018,7 +1165,7 @@
             </void> 
             <void method="setProperty"> 
              <string>font</string> 
-             <object class="com.jformdesigner.model.SwingFont"> 
+             <object id="SwingFont1" class="com.jformdesigner.model.SwingFont"> 
               <string>Button.font</string> 
              </object> 
             </void> 
@@ -1030,6 +1177,147 @@
               <string>JavaCodeGenerator.variableModifiers</string> 
               <int>1</int> 
              </void> 
+            </void> 
+           </object> 
+          </void> 
+         </object> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="com.jformdesigner.model.FormContainer"> 
+        <string>javax.swing.JPanel</string> 
+        <object class="com.jformdesigner.model.FormLayoutManager"> 
+         <class>java.awt.GridLayout</class> 
+         <void method="setProperty"> 
+          <string>columns</string> 
+          <int>1</int> 
+         </void> 
+         <void method="setProperty"> 
+          <string>rows</string> 
+          <int>0</int> 
+         </void> 
+         <void method="setProperty"> 
+          <string>hgap</string> 
+          <int>5</int> 
+         </void> 
+         <void method="setProperty"> 
+          <string>vgap</string> 
+          <int>5</int> 
+         </void> 
+        </object> 
+        <void method="setProperty"> 
+         <string>border</string> 
+         <object class="javax.swing.border.CompoundBorder"> 
+          <object class="javax.swing.border.TitledBorder"> 
+           <null/> 
+           <string>Color Mapping</string> 
+           <int>4</int> 
+           <int>0</int> 
+           <null/> 
+           <null/> 
+          </object> 
+          <object idref="EmptyBorder0"/> 
+         </object> 
+        </void> 
+        <void method="setProperty"> 
+         <string>font</string> 
+         <object idref="SwingFont0"/> 
+        </void> 
+        <void method="auxiliary"> 
+         <void method="setProperty"> 
+          <string>JavaCodeGenerator.variableLocal</string> 
+          <boolean>true</boolean> 
+         </void> 
+        </void> 
+        <void property="name"> 
+         <string>configPanel3</string> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormContainer"> 
+          <string>javax.swing.JPanel</string> 
+          <object class="com.jformdesigner.model.FormLayoutManager"> 
+           <class>java.awt.GridLayout</class> 
+          </object> 
+          <void method="setProperty"> 
+           <string>border</string> 
+           <object class="javax.swing.border.EmptyBorder"> 
+            <object class="java.awt.Insets"> 
+             <int>0</int> 
+             <int>0</int> 
+             <int>0</int> 
+             <int>0</int> 
+            </object> 
+           </object> 
+          </void> 
+          <void property="name"> 
+           <string>panel9</string> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JButton</string> 
+            <void method="setProperty"> 
+             <string>alignmentX</string> 
+             <float>0.5</float> 
+            </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object idref="SwingFont1"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>minimumSize</string> 
+             <object class="java.awt.Dimension"> 
+              <int>32</int> 
+              <int>32</int> 
+             </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>maximumSize</string> 
+             <object class="java.awt.Dimension"> 
+              <int>32</int> 
+              <int>32</int> 
+             </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>preferredSize</string> 
+             <object class="java.awt.Dimension"> 
+              <int>32</int> 
+              <int>64</int> 
+             </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>margin</string> 
+             <object class="java.awt.Insets"> 
+              <int>0</int> 
+              <int>0</int> 
+              <int>0</int> 
+              <int>0</int> 
+             </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>border</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>borderPainted</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void property="name"> 
+             <string>legend</string> 
+            </void> 
+            <void method="auxiliary"> 
+             <void method="setProperty"> 
+              <string>JavaCodeGenerator.variableModifiers</string> 
+              <int>1</int> 
+             </void> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.ActionListener</string> 
+              <string>actionPerformed</string> 
+              <string>legendActionPerformed</string> 
+              <boolean>true</boolean> 
+             </object> 
             </void> 
            </object> 
           </void> 
@@ -1061,6 +1349,12 @@
             <void method="setProperty"> 
              <string>editable</string> 
              <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object class="com.jformdesigner.model.SwingFont"> 
+              <string>Label.font</string> 
+             </object> 
             </void> 
             <void property="name"> 
              <string>infoText</string> 

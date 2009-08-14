@@ -20,46 +20,42 @@
 package dynamic;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
 /*
- * Created by JFormDesigner on Thu Mar 12 15:15:39 CST 2009
- */ 
+ * Created by JFormDesigner on Sun Aug 09 16:20:33 CST 2009
+ */
 
-import cytoscape.CyEdge;
 import cytoscape.CyNetwork;
 import cytoscape.CyNode;
 import cytoscape.Cytoscape;
 import cytoscape.data.CyAttributes;
-import cytoscape.layout.CyLayoutAlgorithm;
-import cytoscape.layout.CyLayouts;
-import cytoscape.util.CyNetworkNaming;
 
 
 
 /**
- * @author PITTACUS
+ * @author SHOCKIE
  */
-public class ResultPanel extends JPanel {
+public class BatchResultPanel extends JPanel {
 	Perturbation perturbation;
 	String freeConcentrations;
 	Parameter parameter;
-	
-	public ResultPanel(Perturbation p, Parameter para) {
+
+	public BatchResultPanel(Perturbation p, Parameter para) {
 		initComponents();
 		perturbation = p;
 		parameter = para;
 		setName(parameter.result);
-		cutoffSlider.setValue((int)(parameter.subgroupThreshold*100));
-		cutoffSliderStateChanged(null);
+		initComponents();
+		DefaultTableModel model = (DefaultTableModel) subnetInfo.getModel();
+		perturbation.highlightSubnetwork(model, parameter, 1, false);
 		subnetInfo.getSelectionModel().addListSelectionListener(
 				new ListSelectionListener() {
 					public void valueChanged(ListSelectionEvent e) {
@@ -69,8 +65,8 @@ public class ResultPanel extends JPanel {
 								.getModel();
 						int first = e.getFirstIndex();
 						int last = e.getLastIndex();
-//						System.out.printf("%s %d %d\n", e.toString(), first,
-//								last);
+						System.out.printf("%s %d %d\n", e.toString(), first,
+								last);
 						CyNetwork network = Cytoscape.getCurrentNetwork();
 						CyAttributes attributes = Cytoscape.getNodeAttributes();
 						network.unselectAllNodes();
@@ -87,51 +83,10 @@ public class ResultPanel extends JPanel {
 								network.setSelectedNodeState(node, true);			
 							}
 						}
-						perturbation.OnViewResult();						
+						Cytoscape.getCurrentNetworkView().redrawGraph(false, false);
 					}
 				});
-	}
-
-	private void cutoffSliderStateChanged(ChangeEvent e) {
-		DefaultTableModel model = (DefaultTableModel) subnetInfo.getModel();
-		perturbation.highlightSubnetwork(model, parameter, cutoffSlider.getValue()/100.0D, false);
-	}
-
-	private void highlightButtonActionPerformed(ActionEvent e) {
-		DefaultTableModel model = (DefaultTableModel) subnetInfo.getModel();
-		perturbation.highlightSubnetwork(model, parameter, cutoffSlider.getValue()/100.0D, true);
-	}
-
-	private void unhighlightButtonActionPerformed(ActionEvent e) {
-	}
-
-	private void createSubgroupButtonActionPerformed(ActionEvent e) {
-		highlightButtonActionPerformed(e);
-		String vs = Cytoscape.getCurrentNetworkView().getVisualStyle().getName();
-		CyNetwork network = Cytoscape.getCurrentNetwork();
-
-		Set nodes = network.getSelectedNodes();
-		Set edges = new HashSet();
-		Iterator iterator = network.edgesIterator();
-		while (iterator.hasNext()) {
-			CyEdge edge = (CyEdge) iterator.next();
-			if (nodes.contains(edge.getSource())
-					&& nodes.contains(edge.getTarget()))
-				edges.add(edge);
 		}
-		CyNetwork newNetwork = Cytoscape.createNetwork(nodes, edges,
-				CyNetworkNaming.getSuggestedSubnetworkTitle(network),
-				network);
-		Cytoscape.createNetworkView(newNetwork, " subgroup ["+cutoffSlider.getValue()/100.0D+"]");
-		Cytoscape.getNetworkView(newNetwork.getIdentifier()).setVisualStyle(vs);
-		Cytoscape.getNetworkView(newNetwork.getIdentifier()).redrawGraph(false, true);
-//		CyLayoutAlgorithm lyaout = CyLayouts.getLayout("organic");
-//		for(CyLayoutAlgorithm layout:CyLayouts.getAllLayouts()){			
-//			System.out.println(layout);
-//		}
-//		CyLayouts.getLayout("organic").doLayout(Cytoscape.getNetworkView(subnewNetwork.getIdentifier()));
-	}
-		
 
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -140,12 +95,7 @@ public class ResultPanel extends JPanel {
 		panel1 = new JPanel();
 		panel2 = new JPanel();
 		panel4 = new JPanel();
-		label1 = new JLabel();
 		panel3 = new JPanel();
-		highlightButton = new JButton();
-		hSpacer1 = new JPanel(null);
-		createSubgroupButton = new JButton();
-		cutoffSlider = new JSlider();
 		scrollPane1 = new JScrollPane();
 		subnetInfo = new JTable();
 		rightPane = new JPanel();
@@ -160,53 +110,19 @@ public class ResultPanel extends JPanel {
 
 		panel4.setLayout(new BorderLayout(10, 0));
 
-		label1.setText("Subgroup threshold (%)");
-		label1.setLabelFor(cutoffSlider);
-		label1.setToolTipText("Filter the nodes by the change rates > threshold");
-		panel4.add(label1, BorderLayout.CENTER);
-
 		panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
-
-		highlightButton.setText("Highlight all nodes in subgroup");
-		highlightButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				highlightButtonActionPerformed(e);
-			}
-		});
-		panel3.add(highlightButton);
-		panel3.add(hSpacer1);
-
-		createSubgroupButton.setText("Create subgroup view");
-		createSubgroupButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				createSubgroupButtonActionPerformed(e);
-			}
-		});
-		panel3.add(createSubgroupButton);
 		panel4.add(panel3, BorderLayout.EAST);
 		panel2.add(panel4);
-
-		cutoffSlider.setMinorTickSpacing(1);
-		cutoffSlider.setPaintTicks(true);
-		cutoffSlider.setPaintLabels(true);
-		cutoffSlider.setMajorTickSpacing(10);
-		cutoffSlider.setValue(20);
-		cutoffSlider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				cutoffSliderStateChanged(e);
-			}
-		});
-		panel2.add(cutoffSlider);
 
 
 		subnetInfo.setModel(new DefaultTableModel(
 			new Object[][] {
 				{"Threshold of disturbed subgroup", null},
-				{"Disturbed subgroup size", "2"},
-				{"Average of change ratios", "1.23"},
-				{"Maximum of change ratios", null},
-				{"Minimum of change ratios", null},
-				{"--- Protein list ---", "--- Change ratio ---"},
+				{"Total proteins", ""},
+				{"Average of subgroup sizes", ""},
+				{"Maximum of subgroup sizes", null},
+				{"Minimum of subgroup sizes", null},
+				{"--- Protein list ---", "--- Subgroup size ---"},
 			},
 			new String[] {
 				"Property", "Value"
@@ -229,7 +145,7 @@ public class ResultPanel extends JPanel {
 		panel1.add(panel2, BorderLayout.CENTER);
 		splitPane.setLeftComponent(panel1);
 
-		rightPane.setBorder(new TitledBorder("Distribution of Change Ratios of Disturbed Proteins [Source Excluded]"));
+		rightPane.setBorder(new TitledBorder("Distribution of Disturbed Subgroup Sizes"));
 		rightPane.setLayout(new BorderLayout());
 		splitPane.setRightComponent(rightPane);
 		add(splitPane, BorderLayout.CENTER);
@@ -242,12 +158,7 @@ public class ResultPanel extends JPanel {
 	private JPanel panel1;
 	private JPanel panel2;
 	private JPanel panel4;
-	private JLabel label1;
 	private JPanel panel3;
-	private JButton highlightButton;
-	private JPanel hSpacer1;
-	private JButton createSubgroupButton;
-	private JSlider cutoffSlider;
 	private JScrollPane scrollPane1;
 	private JTable subnetInfo;
 	public JPanel rightPane;
