@@ -22,20 +22,36 @@ package dynamic;
 import java.util.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.GridLayout;
+import java.awt.Paint;
+
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartMouseEvent;
+import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.Axis;
+import org.jfree.chart.axis.LogAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.ui.RectangleEdge;
 
 import giny.view.NodeView;
 
@@ -56,87 +72,119 @@ import cytoscape.visual.calculators.Calculator;
 import cytoscape.visual.mappings.BoundaryRangeValues;
 import cytoscape.visual.mappings.ContinuousMapping;
 import cytoscape.visual.mappings.ObjectMapping;
+import cytoscape.visual.ui.editors.continuous.C2CMappingEditor;
+import cytoscape.visual.ui.editors.continuous.ContinuousMappingEditorPanel;
+import cytoscape.visual.ui.editors.continuous.GradientEditorPanel;
 
 import cytoscape.data.CyAttributes;
+import cytoscape.ding.CyGraphAllLOD;
+import cytoscape.ding.CyGraphLOD;
+import cytoscape.ding.DingNetworkView;
 import cytoscape.task.Task;
 import cytoscape.task.TaskMonitor;
 import cytoscape.task.util.TaskManager;
 import cytoscape.task.ui.JTaskConfig;
 import java.util.Calendar;
 import java.text.*;
+import cytoscape.ding.CyGraphLOD;
+import cytoscape.ding.CyGraphAllLOD;
+import cytoscape.ding.DingNetworkView;
 
 
 class Config {
-	public static final String NAME = "Perturbation";
+	public static final String NAME = "PerturbationAnalyzer";
 	public static final String OUTPUT = "Perturbation Analysis";
-	public static final String SUFFIX_FC_BEFORE=".freeConcentrationBefore";
-	public static final String SUFFIX_FC_AFTER=".freeConcentrationAfter";
-	public static final String SUFFIX_FOLD=".fold";
-	public static final String SUFFIX_SUBNET_SIZE=".subnetSize";
-	public static final String SUFFIX_SELECT=".select";
-	public static final String PREFIX_PARAMETER="perturbationParameter.";
+	public static final String SUFFIX_FC_BEFORE = ".fcBefore";
+	public static final String SUFFIX_FC_AFTER = ".fcAfter";
+	public static final String SUFFIX_FOLD = ".fold";
+	public static final String SUFFIX_SUBNET_SIZE = ".subnetSize";
+	public static final String SUFFIX_SELECT = ".select";
+	public static final String PREFIX_PARAMETER = "perturbationParameter.";
 
-	public static final String PARAMETER_TC="proteinAbundance";
-	public static final String PARAMETER_RESULT="result";
-	public static final String PARAMETER_TYPE="perturbationType";
-	public static final String PARAMETER_FOLD="changeFold";
-	public static final String PARAMETER_CRITERIA="iterativeCriteria";
+	public static final String PARAMETER_TC = "proteinAbundance";
+	public static final String PARAMETER_RESULT = "result";
+	public static final String PARAMETER_TYPE = "perturbationType";
+	public static final String PARAMETER_FOLD = "changeFold";
+	public static final String PARAMETER_CRITERIA = "iterativeCriteria";
+	public static final String PARAMETER_THRESHOLD = "disturbedThreshold";
+	public static final String PARAMETER_DISSOCIATION = "dissociationConstant";
 
-	public static final int PERTURBATION_SINGLE=0;
-	public static final int PERTURBATION_BATCH=1;
+	public static final int PERTURBATION_SINGLE = 0;
+	public static final int PERTURBATION_BATCH = 1;
 
-	public static final String DEFAULT_RESULT_NAME="Auto Result.{CURRENT DATETIME}";
-	public static final String DEFAULT_DISSOCIATION_CONSTANT="MAX(Ci,Cj)/20";
+	public static final String DEFAULT_RESULT_NAME = "Perturbation.result.{CURRENT DATETIME}";
+	public static final String DEFAULT_DISSOCIATION_CONSTANT = "MAX(Ci,Cj)/20";
 }
-class Parameter{
+
+class Parameter {
 	String proteinAbundance;
 	String result;
 	int perturbationType;
 	double changeFold;
 	double iterativeCriteria;
-
-	void parseMap(Map parameter){
+	double subgroupThreshold;
+	double dissociationConstant;
+	Parameter(){
+		
+	}
+	Parameter(Map parameter) {
+		parseMap(parameter);
+	}
+	void parseMap(Map parameter) {
 		proteinAbundance = (String) parameter.get(Config.PARAMETER_TC);
 		result = (String) parameter.get(Config.PARAMETER_RESULT);
-		perturbationType = Integer.parseInt((String)parameter.get(Config.PARAMETER_TYPE));
-		changeFold = Double.parseDouble((String)parameter.get(Config.PARAMETER_FOLD));
-		iterativeCriteria = Double.parseDouble((String)parameter.get(Config.PARAMETER_CRITERIA));	
+		perturbationType = Integer.parseInt((String) parameter
+				.get(Config.PARAMETER_TYPE));
+		changeFold = Double.parseDouble((String) parameter
+				.get(Config.PARAMETER_FOLD));
+		iterativeCriteria = Double.parseDouble((String) parameter
+				.get(Config.PARAMETER_CRITERIA));
+		subgroupThreshold = Double.parseDouble((String) parameter
+				.get(Config.PARAMETER_THRESHOLD));
+		dissociationConstant = Double.parseDouble((String) parameter
+				.get(Config.PARAMETER_DISSOCIATION));
 	}
-	Map<String,String> toMap(){
+
+	Map<String, String> toMap() {
 		Map parameter = new HashMap();
 		parameter.put(Config.PARAMETER_TC, proteinAbundance);
 		parameter.put(Config.PARAMETER_RESULT, result);
 		parameter.put(Config.PARAMETER_TYPE, String.valueOf(perturbationType));
 		parameter.put(Config.PARAMETER_FOLD, String.valueOf(changeFold));
-		parameter.put(Config.PARAMETER_CRITERIA, String.valueOf(iterativeCriteria));
+		parameter.put(Config.PARAMETER_CRITERIA, String
+				.valueOf(iterativeCriteria));
+		parameter.put(Config.PARAMETER_THRESHOLD, String
+				.valueOf(subgroupThreshold));
+		parameter.put(Config.PARAMETER_DISSOCIATION, String
+				.valueOf(dissociationConstant));
 		return parameter;
 	}
-	boolean checkResult(){
+
+	boolean checkResult() {
 		CyAttributes attributes = Cytoscape.getNodeAttributes();
-		if(perturbationType==Config.PERTURBATION_BATCH){
+		if (perturbationType == Config.PERTURBATION_SINGLE) {
 			return attributes.getType(result + Config.SUFFIX_FC_BEFORE) == CyAttributes.TYPE_FLOATING
-			&& attributes.getType(result + Config.SUFFIX_FC_AFTER) == CyAttributes.TYPE_FLOATING
-			&& attributes.getType(result + Config.SUFFIX_FOLD) == CyAttributes.TYPE_FLOATING
-			&& attributes.getType(result + Config.SUFFIX_SELECT) == CyAttributes.TYPE_BOOLEAN;		
-		}
-		else if(perturbationType==Config.PERTURBATION_SINGLE){
-			return attributes.getType(result + ".select") == CyAttributes.TYPE_BOOLEAN
-			&& attributes.getType(result + ".subnetSize") == CyAttributes.TYPE_INTEGER;
-		}
-		else{
+					&& attributes.getType(result + Config.SUFFIX_FC_AFTER) == CyAttributes.TYPE_FLOATING
+					&& attributes.getType(result + Config.SUFFIX_FOLD) == CyAttributes.TYPE_FLOATING
+					&& attributes.getType(result + Config.SUFFIX_SELECT) == CyAttributes.TYPE_BOOLEAN;
+		} else if (perturbationType == Config.PERTURBATION_BATCH) {
+			return attributes.getType(result + Config.SUFFIX_SELECT) == CyAttributes.TYPE_BOOLEAN
+					&& attributes.getType(result + Config.SUFFIX_SUBNET_SIZE) == CyAttributes.TYPE_FLOATING;
+		} else {
 			return false;
 		}
 	}
 }
 
-
 /**
  * This is a Cytoscape plugin using maslov method to modeling network
  * perturbation.
  */
-public class Perturbation extends CytoscapePlugin implements PropertyChangeListener{
-	ControlPanel control = new ControlPanel();
-	OutputPanel output = new OutputPanel();
+public class Perturbation extends CytoscapePlugin implements
+		PropertyChangeListener {
+	ControlPanel control = new ControlPanel(this);
+	JTabbedPane output = new JTabbedPane();
+
 	/**
 	 * This constructor creates 1. an action and adds it to the Plugins menu, 2.
 	 * a panel and adds it to the west panel.
@@ -144,12 +192,11 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 	public Perturbation() {
 		// JOptionPane.showMessageDialog(Cytoscape.getDesktop(), Config.NAME);
 		Cytoscape.getDesktop().getSwingPropertyChangeSupport()
-		.addPropertyChangeListener(this);
+				.addPropertyChangeListener(this);
 
-		System.out.println("OK");
+		System.out.println("Starting Perturbation ...");
 
-		Cytoscape.getPropertyChangeSupport()
-		.addPropertyChangeListener(this);
+		Cytoscape.getPropertyChangeSupport().addPropertyChangeListener(this);
 
 		PerturbationAction action = new PerturbationAction();
 		action.setPreferredMenu("Plugins");
@@ -158,7 +205,7 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 		CytoPanel westPanel = Cytoscape.getDesktop().getCytoPanel(
 				SwingConstants.WEST);
 		westPanel.add(Config.NAME, null, control, Config.NAME);
-		westPanel.setSelectedIndex(westPanel.indexOfComponent(Config.NAME));
+//		westPanel.setSelectedIndex(westPanel.indexOfComponent(Config.NAME));
 
 		CytoPanel southPanel = Cytoscape.getDesktop().getCytoPanel(
 				SwingConstants.SOUTH);
@@ -170,21 +217,103 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 				onCalculate();
 			}
 		});
+
+		JPopupMenu popup = new JPopupMenu();
+		JMenuItem itemA = new JMenuItem("Close & Delete");
+		itemA.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				onDeleteResult();
+			}
+		});
+		popup.add(itemA);
+		output.setComponentPopupMenu(popup);
+
+		output.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				OnViewResult();
+			}
+		});
 	}
 
-	protected Calculator createCalculator(String freeConcentrations) {
+	protected void OnViewResult() {
+		if(output.getSelectedComponent()==null) return;
+		String name = output.getSelectedComponent().getName();
+		Parameter parameter = new Parameter(Cytoscape.getNetworkAttributes()
+				.getMapAttribute(Cytoscape.getCurrentNetwork().getIdentifier(), Config.PREFIX_PARAMETER+name));
 
+		Map map = buildMap();
+		boolean sel[] = getBooleanAttribute(map, name + Config.SUFFIX_SELECT);
+		//highlightNodes(map, sel);
+
+		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
+		NodeAppearanceCalculator nac = manager.getVisualStyle()
+				.getNodeAppearanceCalculator();
+		//manager.getVisualStyle().getNodeAppearanceCalculator().removeCalculator(VisualPropertyType.NODE_FILL_COLOR);
+		nac.setCalculator(createCalculator(parameter));
+		manager.applyNodeAppearances();
+		manager.fireStateChanged();
+		control.legend.setIcon(GradientEditorPanel.getIcon(control.legend.getWidth(), control.legend.getHeight(),
+				(VisualPropertyType) VisualPropertyType.NODE_FILL_COLOR));
+		Cytoscape.getCurrentNetworkView().redrawGraph(false, true);
+
+		try{
+			if(Cytoscape.getCurrentNetworkView()!=null)
+				((DingNetworkView)Cytoscape.getCurrentNetworkView()).setGraphLOD(new CyGraphAllLOD());
+		}catch(Exception e){
+		}
+		if (parameter.perturbationType == Config.PERTURBATION_SINGLE)
+			highlightSources(map, sel);		
+		//highlightNodes(map, sel);
+	}
+
+	protected void onDeleteResult() {
+		String result = output.getSelectedComponent().getName();
+		output.remove(output.getSelectedComponent());
+		CyAttributes attributes = Cytoscape.getNodeAttributes();
+		attributes.deleteAttribute(result + Config.SUFFIX_FC_BEFORE);
+		attributes.deleteAttribute(result + Config.SUFFIX_FC_AFTER);
+		attributes.deleteAttribute(result + Config.SUFFIX_FOLD);
+		attributes.deleteAttribute(result + Config.SUFFIX_SELECT);
+		attributes.deleteAttribute(result + Config.SUFFIX_SELECT);
+		attributes.deleteAttribute(result + Config.SUFFIX_SUBNET_SIZE);
+		Cytoscape.getNetworkAttributes().deleteAttribute(
+				Config.PREFIX_PARAMETER + result);
+		Cytoscape.firePropertyChange(Cytoscape.ATTRIBUTES_CHANGED, null, null);
+	}
+
+	protected Calculator createCalculator(Parameter parameter) {
+		String index = null;
+		if (parameter.perturbationType == Config.PERTURBATION_SINGLE)
+			return createCalculatorSingle(parameter);
+		else if (parameter.perturbationType == Config.PERTURBATION_BATCH)
+			return createCalculatorBatch(parameter);
+		else {
+			alert("Invalid perturbationType!");
+			return null;
+		}
+	}// createCalculator
+	
+	protected Calculator createCalculatorSingle(Parameter parameter) {
+		String index = null;
+		index = parameter.result + Config.SUFFIX_FOLD;
+	
+		//log("Visual mapping: " + index);
 		ContinuousMapping contMapping = new ContinuousMapping(new Color(204,
 				204, 204), ObjectMapping.NODE_MAPPING);
-		contMapping.setControllingAttributeName(freeConcentrations+".fold", Cytoscape
+		contMapping.setControllingAttributeName(index, Cytoscape
 				.getCurrentNetwork(), true);
 		BoundaryRangeValues brVals;
 		brVals = new BoundaryRangeValues();
-		// blue
-		brVals.lesserValue = new Color(0, 0, 255);
-		brVals.equalValue = new Color(0, 0, 255);
-		brVals.greaterValue = new Color(0, 0, 255);
-		contMapping.addPoint(0.8, brVals);
+		// green
+		brVals.lesserValue = new Color(0, 255, 0);
+		brVals.equalValue = new Color(0, 128, 0);
+		brVals.greaterValue = new Color(0, 128, 0);
+		contMapping.addPoint(0.0, brVals);
+
+		brVals.lesserValue = new Color(0, 255, 0);
+		brVals.equalValue = new Color(0, 128, 0);
+		brVals.greaterValue = new Color(0, 128, 0);
+		contMapping.addPoint(1.0-parameter.subgroupThreshold, brVals);
 
 		// white
 		brVals = new BoundaryRangeValues();
@@ -195,14 +324,71 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 
 		// red
 		brVals = new BoundaryRangeValues();
+		brVals.lesserValue = new Color(128, 0, 0);
+		brVals.equalValue = new Color(128, 0, 0);
+		brVals.greaterValue = new Color(128, 0, 0);
+		contMapping.addPoint(1.0+parameter.subgroupThreshold, brVals);
+
+		brVals = new BoundaryRangeValues();
 		brVals.lesserValue = new Color(255, 0, 0);
 		brVals.equalValue = new Color(255, 0, 0);
 		brVals.greaterValue = new Color(255, 0, 0);
-		contMapping.addPoint(1.2, brVals);
-
+		contMapping.addPoint(2.0, brVals);
+		
 		Calculator dynamicCalculator = new BasicCalculator("Node Color Calc",
-				contMapping,
-				VisualPropertyType.NODE_FILL_COLOR);
+				contMapping, VisualPropertyType.NODE_FILL_COLOR);
+		return dynamicCalculator;
+	}// createCalculator
+
+	protected Calculator createCalculatorBatch(Parameter parameter) {
+		String index = null;
+		index = parameter.result + Config.SUFFIX_SUBNET_SIZE;
+		
+		//log("Visual mapping: " + index);
+		ContinuousMapping contMapping = new ContinuousMapping(new Color(204,
+				204, 204), ObjectMapping.NODE_MAPPING);
+		contMapping.setControllingAttributeName(index, Cytoscape
+				.getCurrentNetwork(), false);
+		BoundaryRangeValues brVals;
+		brVals = new BoundaryRangeValues();
+		
+		// white
+		brVals = new BoundaryRangeValues();
+		brVals.lesserValue = new Color(255, 255, 255);
+		brVals.equalValue = new Color(255, 255, 255);
+		brVals.greaterValue = new Color(255, 255, 255);
+		contMapping.addPoint(0.0, brVals);
+
+		// white
+		brVals = new BoundaryRangeValues();
+		brVals.lesserValue = new Color(255, 255, 255);
+		brVals.equalValue = new Color(255, 255, 255);
+		brVals.greaterValue = new Color(255, 255, 255);
+		contMapping.addPoint(1.0, brVals);
+
+		// blue
+		brVals = new BoundaryRangeValues();
+		brVals.lesserValue = new Color(0, 0, 255);
+		brVals.equalValue = new Color(0, 0, 255);
+		brVals.greaterValue = new Color(0, 0, 255);
+		contMapping.addPoint(30.0, brVals);
+
+		// red
+		brVals = new BoundaryRangeValues();
+		brVals.lesserValue = new Color(128, 0, 0);
+		brVals.equalValue = new Color(128, 0, 0);
+		brVals.greaterValue = new Color(128, 0, 0);
+		contMapping.addPoint(60.0, brVals);
+		
+		// red
+		brVals = new BoundaryRangeValues();
+		brVals.lesserValue = new Color(255, 0, 0);
+		brVals.equalValue = new Color(255, 0, 0);
+		brVals.greaterValue = new Color(255, 0, 0);
+		contMapping.addPoint(Cytoscape.getCurrentNetwork().getNodeCount(), brVals);
+		
+		Calculator dynamicCalculator = new BasicCalculator("Node Color Calc",
+				contMapping, VisualPropertyType.NODE_FILL_COLOR);
 		return dynamicCalculator;
 	}// createCalculator
 
@@ -214,201 +400,189 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 
 		String[] attrArray = attributes.getAttributeNames();
 		Arrays.sort(attrArray);
-		for(String s:attrArray) {
-			if(s.startsWith(Config.PREFIX_PARAMETER)){
-				try{
-					parameter.parseMap(
-							Cytoscape.getNetworkAttributes().getMapAttribute(network.getIdentifier(),s)
-					);
+		for (String s : attrArray) {
+			if (s.startsWith(Config.PREFIX_PARAMETER)) {
+				try {
+					parameter.parseMap(Cytoscape.getNetworkAttributes()
+							.getMapAttribute(network.getIdentifier(), s));
 
-					if(parameter.checkResult())
+					if (parameter.checkResult())
 						analyse(parameter);
+					else {
+						log("checkResult failed: " + s);
+						log("Maybe the result is calculated by former version.");
+					}
+				} catch (Exception e) {
+					log("Import result failed: " + s);
+					log("Maybe the result is calculated by former version.");
+					//alert(e.getLocalizedMessage());
+					e.printStackTrace();
 				}
-				catch(Exception e){}
 			}
 		}
 	}
+
 	protected void analyse(Parameter parameter) {
-		if(parameter.perturbationType==Config.PERTURBATION_SINGLE)
+		log("Analyse start: " + parameter.result);
+		for (Component c : output.getComponents()) {
+			if (c.getName().compareTo(parameter.result) == 0) {
+				log("Remove : " + c.getName());
+				output.remove(c);
+			}
+		}
+		if (parameter.perturbationType == Config.PERTURBATION_SINGLE)
 			analyseSingle(parameter);
-		else if(parameter.perturbationType==Config.PERTURBATION_BATCH)
+		else if (parameter.perturbationType == Config.PERTURBATION_BATCH)
 			analyseBatch(parameter);
+		for (Component c : output.getComponents()) {
+			if (c.getName().compareTo(parameter.result) == 0) {
+				output.setSelectedComponent(c);
+			}
+		}
+		log("Analyse end: " + parameter.result);
+	}
+	double[] Arrays_copyOf(double[] s, int end){
+		double[] r=new double [end];
+		for(int k=0;k<end;k++){
+			r[k]=s[k];
+		}
+		return r;
+	}
+	double[] Arrays_copyOf(double[] s, int start, int end){
+		double[] r=new double [end-start];
+		for(int k=start;k<end;k++){
+			r[k-start]=s[k];
+		}
+		return r;
 	}
 	protected void analyseBatch(Parameter parameter) {
 		CyNetwork network = Cytoscape.getCurrentNetwork();
 		CyNetworkView view = Cytoscape.getCurrentNetworkView();
 		CyAttributes attributes = Cytoscape.getNodeAttributes();
-		if (network == null || view == null){
+		if (network == null || view == null) {
 			alert("You have to load protein ineraction network first!");
 			return;
 		}
 
-		String name = parameter.result;
-		//Process
-		log("analyse start ["+network.getTitle()+","+name+"]");
-
 		// init
-		Map map=buildMap();
-		boolean sel[]=getBooleanAttribute(map, name+Config.SUFFIX_SELECT);
+		String name = parameter.result;
+		Map map = buildMap();
+		double fold[] = getDoubleAttribute(map, name
+				+ Config.SUFFIX_SUBNET_SIZE);
+		boolean sel[] = getBooleanAttribute(map, name + Config.SUFFIX_SELECT);
 
-		for (Component c: output.tabbedPane.getComponents())
-		{
-			if (c.getName().compareTo(name)==0){
-				log("Remove : "+c.getName());
-				output.tabbedPane.remove(c);
+		// Process
+		BatchResultPanel panel = new BatchResultPanel(this, parameter);
+		output.add(parameter.result, panel);
+
+		int i, j;
+		for (i = j = 0; j < fold.length; ++j) {
+			if (sel[j]) {
+				if (i != j) {
+					double t = fold[i];
+					fold[i] = fold[j];
+					fold[j] = t;
+				}
+				++i;
 			}
 		}
-		ResultPanel panel = new ResultPanel(this, parameter);
-		output.tabbedPane.add(name, panel);
+		
+		double sourceFold[] = Arrays_copyOf(fold, i);
+		double disturbedFold[] = Arrays_copyOf(fold, i, fold.length);
 
-		{
-			double fold[]=getDoubleAttribute(map, name+Config.SUFFIX_SUBNET_SIZE);
-
-			int i, j;
-			for (i = j = 0; j < fold.length; ++j){
-				if (sel[j]) fold[i++] = fold[j];
-			}
-			fold = Arrays.copyOf(fold, i);
-
-			HistogramDataset histogramdataset = new HistogramDataset(); 
-			histogramdataset.addSeries("", fold, 100); 
-
-			JFreeChart jfreechart = ChartFactory.createHistogram(
-					"Histogram of Subgroup Sizes of Source Proteins",
-					null, null, 
-					histogramdataset, PlotOrientation.VERTICAL,
-					false, false, false); 
-			jfreechart.getXYPlot().setForegroundAlpha(0.75F); 
-
-			panel.rightPane.add(jfreechart.getTitle().getText(), new ChartPanel(jfreechart));
-		}
-		{
-			double fold[]=getDoubleAttribute(map, name+Config.SUFFIX_SUBNET_SIZE);
-
-			int i, j;
-			for (i = j = 0; j < fold.length; ++j){
-				if (!sel[j]) fold[i++] = fold[j];
-			}
-			fold = Arrays.copyOf(fold, i);
-
-			HistogramDataset histogramdataset = new HistogramDataset(); 
-			histogramdataset.addSeries("", fold, 100); 
-
-			JFreeChart jfreechart = ChartFactory.createHistogram(
-					"Histogram of Subgroup Sizes of Other Proteins",
-					null, null, 
-					histogramdataset, PlotOrientation.VERTICAL,
-					false, false, false); 
-			jfreechart.getXYPlot().setForegroundAlpha(0.75F); 
-
-			panel.rightPane.add(jfreechart.getTitle().getText(), new ChartPanel(jfreechart));
-		}
-
+		
+		HistogramDataset histogramdataset = new HistogramDataset();
+		histogramdataset.addSeries("", sourceFold, 100);
+		JFreeChart jfreechart = ChartFactory.createHistogram(
+				null, null,
+				null, histogramdataset, PlotOrientation.VERTICAL, false,
+				false, false);
+        jfreechart.getXYPlot().getRangeAxis().setLabel("Number of Disturbed Subgroups");
+        jfreechart.getXYPlot().getDomainAxis().setLabel("Disturbed Subgroup Size");
+		jfreechart.getXYPlot().setForegroundAlpha(0.75F);
+		ChartPanel p = new ChartPanel(jfreechart);
+		p.setHorizontalAxisTrace(true);
+		panel.rightPane.add("Center",p);
+		
 		panel.splitPane.setOneTouchExpandable(true);
 		panel.splitPane.setResizeWeight(0.5);
-		panel.splitPane.getLeftComponent().setVisible(false);
-		highlightNodes(map,sel);
-
-		log("analyse end ["+network.getTitle()+","+name+"]");
-		if(true) return;
-		
-		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
-		NodeAppearanceCalculator nac = manager.getVisualStyle()
-		.getNodeAppearanceCalculator();
-		nac.setCalculator(createCalculator(name));
-		manager.applyNodeAppearances();
-		Cytoscape.getCurrentNetworkView().redrawGraph(false, true);
-
-		log("analyse end ["+network.getTitle()+","+name+"]");
+//		highlightNodes(map, sel);
+//
+//		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
+//		NodeAppearanceCalculator nac = manager.getVisualStyle()
+//				.getNodeAppearanceCalculator();
+//		nac.setCalculator(createCalculator(parameter));
+//		manager.applyNodeAppearances();
+//		Cytoscape.getCurrentNetworkView().redrawGraph(false, true);
 	}
+
 	protected void analyseSingle(Parameter parameter) {
 		CyNetwork network = Cytoscape.getCurrentNetwork();
 		CyNetworkView view = Cytoscape.getCurrentNetworkView();
 		CyAttributes attributes = Cytoscape.getNodeAttributes();
-		if (network == null || view == null){
+		if (network == null || view == null) {
 			alert("You have to load protein ineraction network first!");
 			return;
 		}
 
+		Map map = buildMap();
 		String name = parameter.result;
-		//Process
-		log("analyse start ["+network.getTitle()+","+name+"]");
+		boolean sel[] = getBooleanAttribute(map, name + Config.SUFFIX_SELECT);
 
-		// init
-		Map map=buildMap();
-		boolean sel[]=getBooleanAttribute(map, name+Config.SUFFIX_SELECT);
+		double fold[] = getDoubleAttribute(map, name + Config.SUFFIX_FOLD);
 
-		for (Component c: output.tabbedPane.getComponents())
-		{
-			if (c.getName().compareTo(name)==0){
-				log("Remove : "+c.getName());
-				output.tabbedPane.remove(c);
+		int i, j;
+		for (i = j = 0; j < fold.length; ++j) {
+			if (sel[j]) {
+				if (i != j) {
+					double t = fold[i];
+					fold[i] = fold[j];
+					fold[j] = t;
+				}
+				++i;
 			}
 		}
+		double sourceFold[] = Arrays_copyOf(fold, i);
+		double disturbedFold[] = Arrays_copyOf(fold, i, fold.length);
+		for (i = j = 0; j < disturbedFold.length; ++j) {
+			if (Math.abs(disturbedFold[j]-1.0D)<1e-3) {
+				if (i != j) {
+					double t = fold[i];
+					fold[i] = fold[j];
+					fold[j] = t;
+				}
+				++i;
+			}
+		}
+		double nonzeroDisturbedFold[] = Arrays_copyOf(disturbedFold, i, disturbedFold.length);
+		//System.out.printf("%d %d %d\n", sourceFold.length, disturbedFold.length, nonzeroDisturbedFold.length);
+
 		ResultPanel panel = new ResultPanel(this, parameter);
-		output.tabbedPane.add(parameter.result, panel);
+		output.add(parameter.result, panel);
 
-		{
-			double fold[]=getDoubleAttribute(map, name+Config.SUFFIX_FOLD);
+		String names[] = { "Source", "Disturbed" };
+		double folds[][] = { sourceFold, disturbedFold };
+		for (int k = 1; k < names.length; k++) {
+			HistogramDataset histogramdataset = new HistogramDataset();
+			histogramdataset.addSeries("", folds[k], 100);
 
-			int i, j;
-			for (i = j = 0; j < fold.length; ++j){
-				//	          if (Double.compare(Math.abs(fc[j] - 1.0D), 1e-2) > 0 && fc[j]<1.5) fc[i++] = fc[j];
-				if (sel[j]) fold[i++] = fold[j];
-			}
-			fold = Arrays.copyOf(fold, i);
-
-			HistogramDataset histogramdataset = new HistogramDataset(); 
-			histogramdataset.addSeries("", fold, 100); 
-
-			JFreeChart jfreechart = ChartFactory.createHistogram(
-					"Histogram of Fold Changes of Source Proteins",
-					null, null, 
-					histogramdataset, PlotOrientation.VERTICAL,
-					false, false, false); 
-			jfreechart.getXYPlot().setForegroundAlpha(0.75F); 
-
-			panel.rightPane.add(jfreechart.getTitle().getText(), new ChartPanel(jfreechart));
-		}
-		{
-			double fold[]=getDoubleAttribute(map, name+Config.SUFFIX_FOLD);
-
-			int i, j;
-			for (i = j = 0; j < fold.length; ++j){
-				if (!sel[j]) fold[i++] = fold[j];
-			}
-			fold = Arrays.copyOf(fold, i);
-
-			HistogramDataset histogramdataset = new HistogramDataset(); 
-			histogramdataset.addSeries("", fold, 100); 
-
-			JFreeChart jfreechart = ChartFactory.createHistogram(
-					"Histogram of Fold Changes of Other Proteins",
-					null, null, 
-					histogramdataset, PlotOrientation.VERTICAL,
-					false, false, false); 
-			jfreechart.getXYPlot().setForegroundAlpha(0.75F); 
-
-			panel.rightPane.add(jfreechart.getTitle().getText(), new ChartPanel(jfreechart));
+			JFreeChart jfreechart = ChartFactory.createHistogram(null, null,
+					null, histogramdataset, PlotOrientation.VERTICAL, false,
+					true, false);
+	        jfreechart.getXYPlot().getRangeAxis().setLabel("Number of Disturbed Proteins");
+	        jfreechart.getXYPlot().getDomainAxis().setLabel("Change Ratio");
+			jfreechart.getXYPlot().setForegroundAlpha(0.75F);
+			// LogAxis yAxis = new LogAxis();
+			// jfreechart.getXYPlot().setRangeAxis(yAxis);
+			ChartPanel p = new ChartPanel(jfreechart);
+			p.setHorizontalAxisTrace(true);
+			panel.rightPane.add("Center",p);
+			//panel.rightPane.add(names[k], p);
 		}
 
 		panel.splitPane.setOneTouchExpandable(true);
-		panel.splitPane.setResizeWeight(0.5);
-
-		highlightNodes(map,sel);
-
-		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
-		NodeAppearanceCalculator nac = manager.getVisualStyle()
-		.getNodeAppearanceCalculator();
-		nac.setCalculator(createCalculator(name));
-		manager.applyNodeAppearances();
-		Cytoscape.getCurrentNetworkView().redrawGraph(false, true);
-
-		log("analyse end ["+network.getTitle()+","+name+"]");
+		panel.splitPane.setResizeWeight(0.5);		
 	}
-
-
-
 
 	class PerturbationAction extends CytoscapeAction {
 		public PerturbationAction() {
@@ -426,18 +600,16 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 	}
 
 	protected void log(String msg) {
-		control.infoText.append(now()+" "+msg+"\n");
-		control.infoText.setCaretPosition(control.infoText.getDocument().getLength());
+		control.infoText.append(now() + " " + msg + "\n");
+		control.infoText.setCaretPosition(control.infoText.getDocument()
+				.getLength());
 	}
-
-
-
 
 	protected boolean confirm(String msg) {
 		return JOptionPane.showConfirmDialog(Cytoscape.getCurrentNetworkView()
-				.getComponent(), msg, Config.NAME, JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.OK_OPTION;
+				.getComponent(), msg, Config.NAME, JOptionPane.YES_NO_OPTION,
+				JOptionPane.INFORMATION_MESSAGE) == JOptionPane.OK_OPTION;
 	}
-
 
 	protected String join(AbstractCollection s, String delimiter) {
 		StringBuffer buffer = new StringBuffer();
@@ -454,58 +626,97 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 
 	protected String join(String[] s, String delimiter) {
 		StringBuffer buffer = new StringBuffer();
-		if(s.length>0)
+		if (s.length > 0)
 			buffer.append(s[0]);
-		for(int k=1;k<s.length;k++){
+		for (int k = 1; k < s.length; k++) {
 			buffer.append(delimiter);
 			buffer.append(s[k]);
 		}
 		return buffer.toString();
 	}
 
-	private static final String DATE_FORMAT_NOW = "HH:mm:ss";
+	private static final String DATE_FORMAT_NOW = "yyyy/MM/dd HH:mm:ss";
+	private static final String DATE_FORMAT_NOW_FILE = "yyyyMMddHHmmss";
+
 	public static String now() {
 		Calendar cal = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
 		return sdf.format(cal.getTime());
 	}
-
-
-	//	public void proteinAbundanceChoiceItemStateChanged(ItemEvent e) {
-	//		if (control.iterativeCriteria.getText().length()>0)
-	//			return;
+	public static String nowForFile() {
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW_FILE);
+		return sdf.format(cal.getTime());
+	}
+	
+	public static void showNodeMappingEditor() {
+		try {
+			VisualPropertyType.NODE_FILL_COLOR.showContinuousEditor();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	//from http://www.javalobby.org/forums/thread.jspa?threadID=16906&tstart=0
+	public static String getOrdinalFor(int value) {
+		 int hundredRemainder = value % 100;
+		 int tenRemainder = value % 10;
+		 if(hundredRemainder - tenRemainder == 10) {
+		  return "th";
+		 }
+		 
+		 switch (tenRemainder) {
+		  case 1:
+		   return "st";
+		  case 2:
+		   return "nd";
+		  case 3:
+		   return "rd";
+		  default:
+		   return "th";
+		 }
+		}
+	
+	// public void proteinAbundanceChoiceItemStateChanged(ItemEvent e) {
+	// if (control.iterativeCriteria.getText().length()>0)
+	// return;
 	//		
-	//		CyNetwork network = Cytoscape.getCurrentNetwork();
-	//		CyAttributes attributes = Cytoscape.getNodeAttributes();
+	// CyNetwork network = Cytoscape.getCurrentNetwork();
+	// CyAttributes attributes = Cytoscape.getNodeAttributes();
 	//
-	//		Double minAbundance=null;
-	//		String id;
-	//		for (Iterator i = network.nodesIterator(); i.hasNext();) {
-	//			CyNode node = (CyNode) i.next();
-	//			id = node.getIdentifier();
+	// Double minAbundance=null;
+	// String id;
+	// for (Iterator i = network.nodesIterator(); i.hasNext();) {
+	// CyNode node = (CyNode) i.next();
+	// id = node.getIdentifier();
 	//			
-	//			double abundance = attributes.getAttribute(id, name);
-	//			if (minAbundance!=null)
-	//				minAbundance = Math.min(minAbundance, abundance);
-	//			else
-	//				minAbundance = abundance;
-	//		}
+	// double abundance = attributes.getAttribute(id, name);
+	// if (minAbundance!=null)
+	// minAbundance = Math.min(minAbundance, abundance);
+	// else
+	// minAbundance = abundance;
+	// }
 	//		
-	//		control.iterativeCriteria.setText(String.valueOf(minAbundance));
-	//	}
+	// control.iterativeCriteria.setText(String.valueOf(minAbundance));
+	// }
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
-		//		JOptionPane.showMessageDialog(Cytoscape.getCurrentNetworkView()
-		//				.getComponent(), e.getPropertyName());      	
-		if (e.getPropertyName().equalsIgnoreCase(CytoscapeDesktop.NETWORK_VIEW_FOCUSED)) {
-			log("Cytoscape.NETWORK_VIEW_FOCUSED "+e);
-			setupAnalyse();
+		// JOptionPane.showMessageDialog(Cytoscape.getCurrentNetworkView()
+		// .getComponent(), e.getPropertyName());
+		// log(e.getPropertyName());
+		if (e.getPropertyName().equalsIgnoreCase(
+				CytoscapeDesktop.NETWORK_VIEW_FOCUS)) {
+			log("Loading network");
 		}
-		else if (e.getPropertyName().equalsIgnoreCase(Cytoscape.ATTRIBUTES_CHANGED)) {
-			log("Cytoscape.ATTRIBUTES_CHANGED "+e);
+		if (e.getPropertyName().equalsIgnoreCase("NETWORK_LOADED")) {
+			setupAnalyse();
+		} else if (e.getPropertyName().equalsIgnoreCase(
+				Cytoscape.ATTRIBUTES_CHANGED)) {
+			// log("Attributes Changed");
 
-			Object originalString1 = control.proteinAbundanceChoice.getSelectedItem();
+			Object originalString1 = control.proteinAbundanceChoice
+					.getSelectedItem();
 
 			control.proteinAbundanceChoice.removeAllItems();
 
@@ -515,8 +726,8 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 			attributes = Cytoscape.getNodeAttributes();
 			attrArray = attributes.getAttributeNames();
 			Arrays.sort(attrArray);
-			for(String s:attrArray) {
-				if(attributes.getType(s) == CyAttributes.TYPE_FLOATING)
+			for (String s : attrArray) {
+				if (attributes.getType(s) == CyAttributes.TYPE_FLOATING)
 					control.proteinAbundanceChoice.addItem(s);
 			}
 
@@ -524,31 +735,31 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 		}
 	}
 
-	//	protected void loadSampleData() {
-	//		try{
-	//			Class c=getClass();
-	//			InputStream inStream = c.getResourceAsStream("/data/maslov.xgmml");
+	// protected void loadSampleData() {
+	// try{
+	// Class c=getClass();
+	// InputStream inStream = c.getResourceAsStream("/data/maslov.xgmml");
 	//
-	//			File temp = File.createTempFile("maslov", ".xgmml");
-	//			FileOutputStream outStream = new FileOutputStream(temp);
-	//			byte[] buffer = new byte[8196];
-	//			int length;
-	//			int byteread = 0;
-	//			while ((byteread = inStream.read(buffer)) != -1) {
-	//				outStream.write(buffer, 0, byteread);
-	//			}
-	//			inStream.close();
+	// File temp = File.createTempFile("maslov", ".xgmml");
+	// FileOutputStream outStream = new FileOutputStream(temp);
+	// byte[] buffer = new byte[8196];
+	// int length;
+	// int byteread = 0;
+	// while ((byteread = inStream.read(buffer)) != -1) {
+	// outStream.write(buffer, 0, byteread);
+	// }
+	// inStream.close();
 	//
-	//			Cytoscape.createNetworkFromFile(temp.getAbsolutePath());
-	//			//Cytoscape.getDesktop().getCytoPanel(SwingConstants.CENTER).setState(CytoPanelState.DOCK);
-	//			//Cytoscape.getDesktop().pack();
-	//			control.resultChoice.getEditor().setItem("Perturbation.freeConcentrations");
-	//			log("Load sample data complete");
-	//		}catch(Exception e){
-	//			e.printStackTrace();
-	//			alert("An error may occur when loading sample data!");
-	//		}
-	//	}
+	// Cytoscape.createNetworkFromFile(temp.getAbsolutePath());
+	// //Cytoscape.getDesktop().getCytoPanel(SwingConstants.CENTER).setState(CytoPanelState.DOCK);
+	// //Cytoscape.getDesktop().pack();
+	// control.resultChoice.getEditor().setItem("Perturbation.freeConcentrations");
+	// log("Load sample data complete");
+	// }catch(Exception e){
+	// e.printStackTrace();
+	// alert("An error may occur when loading sample data!");
+	// }
+	// }
 
 	// assume that nodes have Perturbation.totalConcentration attribute
 	// generate Perturbation.freeConcentration attribute
@@ -556,38 +767,47 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 		CyNetwork network = Cytoscape.getCurrentNetwork();
 		CyNetworkView view = Cytoscape.getCurrentNetworkView();
 		CyAttributes attributes = Cytoscape.getNodeAttributes();
-		if (network == null || view == null){
+		if (network == null || view == null || network.getNodeCount() == 0) {
 			alert("You have to load protein ineraction network first!");
 			return;
 		}
 
 		// init
+		if (control.proteinAbundanceChoice.getSelectedItem() == null) {
+			info("You must select the property of protein abundance as total concentration");
+			return;
+		}
+
 		int nSelectedNode = network.getSelectedNodes().size();
-		//		if(nSelectedNode>0)
-		//			alert("You have selected "+nSelectedNode+" proteins, " +
-		//			"and these proteins will be upregulated 2-fold as sources of perturbation");
-		if(nSelectedNode==0){
-			info("You must select one or more proteins as perturbation sources, " +
-			"and these proteins will be upregulated 2-fold as sources of perturbation");
+		// if(nSelectedNode>0)
+		// alert("You have selected "+nSelectedNode+" proteins, " +
+		// "and these proteins will be upregulated 2-fold as sources of perturbation");
+		if (nSelectedNode == 0) {
+			info("You must select one or more proteins as perturbation sources, "
+					+ "and these proteins will be upregulated 2-fold as sources of perturbation");
 			return;
 		}
 
 		Parameter parameter = new Parameter();
-		parameter.proteinAbundance = control.proteinAbundanceChoice.getSelectedItem().toString();
+		parameter.proteinAbundance = control.proteinAbundanceChoice
+				.getSelectedItem().toString();
 		parameter.result = control.getResultName();
 		parameter.perturbationType = control.getPerturbationType();
-		parameter.changeFold = Double.parseDouble(control.changeFoldChoice.getEditor().getItem().toString());
-		parameter.iterativeCriteria = Double.parseDouble(control.iterativeCriteria.getText());
-
+		parameter.changeFold = Double.parseDouble(control.changeFoldChoice
+				.getEditor().getItem().toString());
+		parameter.iterativeCriteria = Double
+				.parseDouble(control.iterativeCriteria.getText());
+		parameter.subgroupThreshold = Double
+				.parseDouble(control.disturbedThreshold.getText())/100D;
+		parameter.dissociationConstant = control.getDissociationConstant();
+		
 		String name = parameter.result;
-		if (attributes.getMapAttribute(network.getIdentifier(), Config.PREFIX_PARAMETER+name) != null) {
-			if (!confirm(name
-					+ " seems being used to save previous result, "
-					+ "are you sure to clear it?")){
+		if (attributes.getMapAttribute(network.getIdentifier(),
+				Config.PREFIX_PARAMETER + name) != null) {
+			if (!confirm(name + " seems being used to save previous result, "
+					+ "are you sure to clear it?")) {
 				return;
-			}
-			else
-			{
+			} else {
 				attributes.deleteAttribute(name + Config.SUFFIX_SELECT);
 				attributes.deleteAttribute(name + Config.SUFFIX_FC_BEFORE);
 				attributes.deleteAttribute(name + Config.SUFFIX_FC_AFTER);
@@ -596,35 +816,30 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 			}
 		}
 
-		Cytoscape.getNetworkAttributes().setMapAttribute(network.getIdentifier(),
-				Config.PREFIX_PARAMETER+name, parameter.toMap());
+		Cytoscape.getNetworkAttributes().setMapAttribute(
+				network.getIdentifier(), Config.PREFIX_PARAMETER + name,
+				parameter.toMap());
 
-		//Process
-		log(network.getTitle()+" calculate start");
+		// Process
+		log("Calculate start: " + network.getTitle());
 		Task task = new Worker(this, parameter);
 		JTaskConfig config = new JTaskConfig();
 		config.displayCancelButton(true);
 		config.displayStatus(true);
-		//config.displayTimeRemaining(true);
+		// config.displayTimeRemaining(true);
 		boolean success = TaskManager.executeTask(task, config);
 
-		//		Perturbation.info(Perturbation.join(attributes.getAttributeNames(),"\r\n"));
-		//		attributes.setAttribute(id, "Perturbation.changeFold", 1.234);
-		//		attributes.setAttribute(id, "Perturbation.freeConcentration", 1.234);
-		//		Perturbation.info(Perturbation.join(attributes.getAttributeNames(),"\r\n"));
-		if(success) {
-			log(network.getTitle()+" calculate end");	
+		if (success) {
+			log("Calculate end: " + network.getTitle());
 			analyse(parameter);
-		}
-		else{
-			log(network.getTitle()+" calculate cancelled");
+		} else {
+			log("Calculate cancelled: " + network.getTitle());
 		}
 	}
 
-	public void highlightSubnetwork(DefaultTableModel model, Parameter parameter, double cutoff, boolean highlightNetwork) {
+	public void highlightSubnetwork(DefaultTableModel model,
+			Parameter parameter, double cutoff, boolean highlightNetwork) {
 		DecimalFormat formatter = new DecimalFormat("0.##");
-
-		model.setValueAt(cutoff, 0, 1);
 
 		CyNetwork network = Cytoscape.getCurrentNetwork();
 		CyNetworkView view = Cytoscape.getCurrentNetworkView();
@@ -632,23 +847,27 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 
 		int n = network.getNodeCount();
 		String name = parameter.result;
-		
-		Map map=buildMap();
+
+		Map map = buildMap();
 
 		double fold[];
-		if(parameter.perturbationType==Config.PERTURBATION_SINGLE)
-			fold=getDoubleAttribute(map, name+Config.SUFFIX_FOLD);
-		else if(parameter.perturbationType==Config.PERTURBATION_BATCH)
-			fold=getDoubleAttribute(map, name+Config.SUFFIX_SUBNET_SIZE);
-		else
-		{
+		if (parameter.perturbationType == Config.PERTURBATION_SINGLE){
+			fold = getDoubleAttribute(map, name + Config.SUFFIX_FOLD);
+			model.setValueAt(cutoff, 0, 1);
+		}
+		else if (parameter.perturbationType == Config.PERTURBATION_BATCH){
+			fold = getDoubleAttribute(map, name + Config.SUFFIX_SUBNET_SIZE);
+			model.setValueAt(parameter.subgroupThreshold, 0, 1);
+		}
+		else {
 			alert("Invalid perturbationType!");
 			return;
 		}
-		boolean sel[]=getBooleanAttribute(map, name+Config.SUFFIX_SELECT);
+		boolean sel[] = getBooleanAttribute(map, name + Config.SUFFIX_SELECT);
 
-		SortedMap subnodes = new TreeMap(); 
+		SortedMap subnodes = new TreeMap();
 
+		double sum=0,min=Double.MAX_VALUE,max=-Double.MAX_VALUE;
 		boolean highlight[] = new boolean[n];
 		String id;
 		int idx;
@@ -656,27 +875,40 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 			CyNode node = (CyNode) i.next();
 			id = node.getIdentifier();
 			idx = (Integer) map.get(id);
-			if(Math.abs(fold[idx]-1.0D)>cutoff){
+			if ((parameter.perturbationType == Config.PERTURBATION_SINGLE && Math.abs(fold[idx] - 1.0D) >= cutoff)
+					||(parameter.perturbationType == Config.PERTURBATION_BATCH && fold[idx] >= cutoff)
+					)
+			{
+
 				subnodes.put(id, fold[idx]);
-				highlight[idx]=true;
+				highlight[idx] = true;
+				sum+=Math.abs(fold[idx]);
+				min=Math.min(min, fold[idx]);
+				max=Math.max(max, fold[idx]);
 			}
 		}
-
+		int m = subnodes.size();
+		if(m>0){
+			sum/=m;
+		}
+		model.setValueAt(m, 1, 1);
+		model.setValueAt(sum, 2, 1);
+		model.setValueAt(max, 3, 1);
+		model.setValueAt(min, 4, 1);
+		
 		if (highlightNetwork) {
-			highlightNodes(map,highlight);
+			highlightNodes(map, highlight);
 			Cytoscape.getCurrentNetworkView().redrawGraph(false, true);
 		}
 
-		int m = subnodes.keySet().size();
-		model.setValueAt(m, 1, 1);
 
-		model.setNumRows(m+5);
+		model.setNumRows(m + 6);
 		Iterator iterator = subnodes.keySet().iterator();
-		int k=0;
+		int k = 0;
 		while (iterator.hasNext()) {
 			Object key = iterator.next();
-			model.setValueAt(key.toString(), 5+k, 0);
-			model.setValueAt(subnodes.get(key).toString(), 5+k, 1);
+			model.setValueAt(key.toString(), 6 + k, 0);
+			model.setValueAt(subnodes.get(key).toString(), 6 + k, 1);
 			k++;
 		}
 	}
@@ -718,11 +950,12 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 		}
 		return tc;
 	}
+
 	public boolean[] getBooleanAttribute(Map map, String name) {
 		CyNetwork network = Cytoscape.getCurrentNetwork();
 		CyAttributes attributes = Cytoscape.getNodeAttributes();
 		if (attributes.getType(name) != CyAttributes.TYPE_BOOLEAN) {
-			alert(name + " must be a float node attribute");
+			alert(name + " must be a boolean node attribute");
 			return null;
 		}
 
@@ -753,6 +986,7 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 			attributes.setAttribute(id, name, fc[idx]);
 		}
 	}
+
 	public void highlightNodes(Map map, boolean[] sel) {
 		CyNetwork network = Cytoscape.getCurrentNetwork();
 		CyAttributes attributes = Cytoscape.getNodeAttributes();
@@ -769,6 +1003,40 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 		}
 	}
 
+	public void highlightSources(Map map, boolean[] sel) {
+		CyNetwork network = Cytoscape.getCurrentNetwork();
+		CyAttributes attributes = Cytoscape.getNodeAttributes();
+
+		String id;
+		int idx;
+		for (Iterator i = network.nodesIterator(); i.hasNext();) {
+			CyNode node = (CyNode) i.next();
+			id = node.getIdentifier();
+			idx = (Integer) map.get(id);
+			//network.setSelectedNodeState(node, sel[idx]);
+			if(sel[idx]){
+				NodeView nv = Cytoscape.getCurrentNetworkView().getNodeView(node);
+				nv.setHeight(nv.getHeight()*2);
+				nv.setWidth(nv.getWidth()*2);
+				nv.setBorderWidth((float) (nv.getHeight()/8));
+				nv.setBorderPaint(new Color(250,250,0));
+//				System.out.println(nv);
+//				System.out.println(nv.getHeight());
+//				System.out.println(nv.getWidth());
+//				System.out.println(nv.getBorderWidth());
+//				attributes.setAttribute(id, VisualPropertyType.NODE_BORDER_COLOR.getBypassAttrName(), "250,250,0");
+//				attributes.setAttribute(id, VisualPropertyType.NODE_LINE_WIDTH.getBypassAttrName(), ""+nv.getHeight()/5);
+//				attributes.setAttribute(id, VisualPropertyType.NODE_HEIGHT.getBypassAttrName(), ""+(nv.getHeight()*2));
+//				attributes.setAttribute(id, VisualPropertyType.NODE_WIDTH.getBypassAttrName(), ""+(nv.getWidth()*2));
+//				System.out.println("highlightSources VisualPropertyType.NODE_BORDER_COLOR "+id);
+//				System.out.println(VisualPropertyType.NODE_LINE_WIDTH.getValueParser());
+//				System.out.println(VisualPropertyType.NODE_LINE_WIDTH.getVisualProperty());
+//				System.out.println(VisualPropertyType.NODE_LINE_WIDTH.getVisualProperty().getDefaultAppearanceObject());
+			}
+		}
+		//Cytoscape.getCurrentNetworkView().redrawGraph(false, true);
+	}
+	
 	public void setAttribute(Map map, String name, boolean[] fc) {
 		CyNetwork network = Cytoscape.getCurrentNetwork();
 		CyAttributes attributes = Cytoscape.getNodeAttributes();
@@ -809,7 +1077,8 @@ public class Perturbation extends CytoscapePlugin implements PropertyChangeListe
 
 	protected void info(String msg) {
 		JOptionPane.showMessageDialog(Cytoscape.getCurrentNetworkView()
-				.getComponent(), msg, Config.NAME, JOptionPane.INFORMATION_MESSAGE);
+				.getComponent(), msg, Config.NAME,
+				JOptionPane.INFORMATION_MESSAGE);
 	}
 
 }
@@ -826,10 +1095,11 @@ class Worker implements Task {
 
 	public Worker(Perturbation p, Parameter param) {
 		perturbation = p;
-		parameter=param;
+		parameter = param;
 	}
 
-	public double[] maslov(String taskTitle, double[] tc, int[][] s) throws InterruptedException {
+	public double[] maslov(String taskTitle, double[] tc, int[][] s)
+			throws InterruptedException {
 		perturbation.log(taskTitle);
 		int n = tc.length;
 		// Calculate
@@ -839,8 +1109,9 @@ class Worker implements Task {
 		double[] fc_old = tc.clone();
 		// s1=hprd_s1; %s1=1./K;
 		// k=340;
-		double k = 340;
+		double k = parameter.dissociationConstant;//340;
 		// s1=s1+diag(diag(s1));% 邻接矩阵加对角线,能模拟homodimer/heterodimer
+		
 		for (int i = 0; i < n; i++)
 			s[i][i] += s[i][i];
 		// Fc_old=Fc.*0.001;
@@ -860,7 +1131,11 @@ class Worker implements Task {
 			for (int i = 0; i < n; i++) {
 				double sum = 0;
 				for (int j = 0; j < n; j++) {
-					sum += s[i][j] * fc[j] / k;
+					if(Math.abs(k)<Double.MIN_VALUE){
+						sum += s[i][j] * fc[j] / (Math.max(tc[i],tc[j])/20);
+					}
+					else
+						sum += s[i][j] * fc[j] / k;
 				}
 				fc[i] = tc[i] / (1 + sum);
 
@@ -868,14 +1143,16 @@ class Worker implements Task {
 				fc_old[i] = fc[i];
 			}
 			DecimalFormat formatter = new DecimalFormat("0.####E0");
-			//			perturbation.log("[" + iter + "," + formatter.format(max) + ","
-			//					+ eps + "]");
+			// perturbation.log("[" + iter + "," + formatter.format(max) + ","
+			// + eps + "]");
 			taskMonitor.setStatus(taskTitle + " " + iter + " / "
 					+ formatter.format(max));
 			if (max < eps)
 				break;
 			// Thread.sleep(300);
 		}
+		for (int i = 0; i < n; i++)
+			s[i][i] /= 2;
 		return fc;
 	}
 
@@ -884,14 +1161,22 @@ class Worker implements Task {
 			throw new IllegalStateException("Task Monitor is not set.");
 		}
 
-		perturbation.log("Protein abundance : " + parameter.proteinAbundance);
-		perturbation.log("Save result as : " + parameter.result);
-		perturbation.log("Change Fold : " + parameter.changeFold);
-
 		try {
-			if(parameter.perturbationType==Config.PERTURBATION_SINGLE)
+			CyNetwork network = Cytoscape.getCurrentNetwork();
+			CyNetworkView view = Cytoscape.getCurrentNetworkView();
+			CyAttributes attributes = Cytoscape.getNodeAttributes();
+			int n = network.getNodeCount();
+
+			perturbation.log("> Protein abundance: "
+					+ parameter.proteinAbundance);
+			perturbation.log("> Save result as: " + parameter.result);
+			perturbation.log("> Change fold: " + parameter.changeFold);
+			perturbation.log("> Select " + network.getSelectedNodes().size()
+					+ " node(s)");
+
+			if (parameter.perturbationType == Config.PERTURBATION_SINGLE)
 				calculateSingle();
-			else if(parameter.perturbationType==Config.PERTURBATION_BATCH)
+			else if (parameter.perturbationType == Config.PERTURBATION_BATCH)
 				calculateBatch();
 
 			Cytoscape.firePropertyChange(Cytoscape.ATTRIBUTES_CHANGED, null,
@@ -900,8 +1185,10 @@ class Worker implements Task {
 			taskMonitor.setException(e, "Calculating cancelled");
 		}
 	}
-	protected void calculateBatch() throws InterruptedException{
-		String id; int idx;
+
+	protected void calculateBatch() throws InterruptedException {
+		String id;
+		int idx;
 
 		CyNetwork network = Cytoscape.getCurrentNetwork();
 		CyNetworkView view = Cytoscape.getCurrentNetworkView();
@@ -911,58 +1198,63 @@ class Worker implements Task {
 		String name = parameter.result;
 		double changeFold = parameter.changeFold;
 		// init
-		Map map=perturbation.buildMap();
+		Map map = perturbation.buildMap();
 
-		double[] tc = perturbation.getDoubleAttribute(map, parameter.proteinAbundance);
+		double[] tc = perturbation.getDoubleAttribute(map,
+				parameter.proteinAbundance);
 		int[][] s = perturbation.getAdjacentMatrix(map);
 
 		// calc
-		double[] fc_before = maslov("Calulate original fc before perturbation", tc, s);
+		double[] fc_before = maslov("Calulate original fc before perturbation",
+				tc, s);
 
-		double[] subnet_size= new double[n];
+		double[] subnet_size = new double[n];
 		boolean[] sel = new boolean[n];
-
-		perturbation.log("Select " + network.getSelectedNodes().size() + " Node(s)");
+		Arrays.fill(subnet_size, 0);
+		Arrays.fill(sel, false);
 		
-		int count=0;
+		int count = 0;
 		for (Object selectedNode : network.getSelectedNodes()) {
 			count++;
 			idx = (Integer) map.get(((CyNode) selectedNode).getIdentifier());
 			double tc0 = tc[idx];
-			sel[idx]=true;
+			sel[idx] = true;
 
-			if(changeFold>0)
+			if (changeFold > 0)
 				tc[idx] *= changeFold;
-			else if(changeFold<0)
+			else if (changeFold < 0)
 				tc[idx] /= (-changeFold);
 
-			double[] fc_after = maslov("Calulate "+ count +"th fc after perturbation", tc, s);
+			double[] fc_after = maslov("Calulate the " + count
+					+ perturbation.getOrdinalFor(count)+" fc after perturbation", tc, s);
 
-			double fc_fold=0;
+			double fc_fold = 0;
 			for (int k = 0; k < n; k++) {
-				if(Math.abs(fc_before[k])<1e-10 && Math.abs(fc_after[k])>1e-10){
+				if (Math.abs(fc_before[k]) < 1e-10
+						&& Math.abs(fc_after[k]) > 1e-10) {
 					subnet_size[idx]++;
-				}
-				else
-				{
-					fc_fold = (fc_before[k] != 0 ? 
-							fc_after[k] / fc_before[k] : Double.NaN);
-				//				TODO changeFold threshold
-					if(Math.abs(fc_fold-1)>0.2D){
+				} else {
+					fc_fold = (fc_before[k] != 0 ? fc_after[k] / fc_before[k]
+							: Double.NaN);
+					// TODO changeFold threshold
+					if (Math.abs(fc_fold - 1) > 0.2D) {
 						subnet_size[idx]++;
 					}
 				}
 			}
 
-			tc[idx]=tc0;
+			tc[idx] = tc0;
 		}
 
 		// write back
-		perturbation.setAttribute(map, name + Config.SUFFIX_SUBNET_SIZE, subnet_size);
+		perturbation.setAttribute(map, name + Config.SUFFIX_SUBNET_SIZE,
+				subnet_size);
 		perturbation.setAttribute(map, name + Config.SUFFIX_SELECT, sel);
 	}
-	protected void calculateSingle() throws InterruptedException{
-		String id; int idx;
+
+	protected void calculateSingle() throws InterruptedException {
+		String id;
+		int idx;
 
 		CyNetwork network = Cytoscape.getCurrentNetwork();
 		CyNetworkView view = Cytoscape.getCurrentNetworkView();
@@ -972,9 +1264,10 @@ class Worker implements Task {
 		String name = parameter.result;
 		double changeFold = parameter.changeFold;
 		// init
-		Map map=perturbation.buildMap();
+		Map map = perturbation.buildMap();
 
-		double[] tc = perturbation.getDoubleAttribute(map, parameter.proteinAbundance);
+		double[] tc = perturbation.getDoubleAttribute(map,
+				parameter.proteinAbundance);
 		int[][] s = perturbation.getAdjacentMatrix(map);
 
 		// calc
@@ -983,13 +1276,12 @@ class Worker implements Task {
 		boolean[] sel = new boolean[n];
 		for (Object selectedNode : network.getSelectedNodes()) {
 			idx = (Integer) map.get(((CyNode) selectedNode).getIdentifier());
-			if(changeFold>0)
+			if (changeFold > 0)
 				tc[idx] *= changeFold;
-			else if(changeFold<0)
+			else if (changeFold < 0)
 				tc[idx] /= (-changeFold);
-			sel[idx]=true;
+			sel[idx] = true;
 		}
-		perturbation.log("Select " + network.getSelectedNodes().size() + "Node(s)");
 
 		double[] fc_after = maslov("Calulate fc after perturbation", tc, s);
 
@@ -997,9 +1289,12 @@ class Worker implements Task {
 		double[] fc_fold = new double[n];
 		for (idx = 0; idx < n; idx++) {
 			fc_fold[idx] = (fc_before[idx] != 0 ? fc_after[idx]
-			                                               / fc_before[idx] : Double.NaN);
+					/ fc_before[idx] : Double.NaN);
+			//if(sel[idx]) fc_fold[idx]=0; // patch for better color mapping
 		}
-		perturbation.setAttribute(map, name + Config.SUFFIX_FC_BEFORE, fc_before);
+
+		perturbation.setAttribute(map, name + Config.SUFFIX_FC_BEFORE,
+				fc_before);
 		perturbation.setAttribute(map, name + Config.SUFFIX_FC_AFTER, fc_after);
 		perturbation.setAttribute(map, name + Config.SUFFIX_FOLD, fc_fold);
 		perturbation.setAttribute(map, name + Config.SUFFIX_SELECT, sel);
@@ -1017,6 +1312,6 @@ class Worker implements Task {
 	}
 
 	public String getTitle() {
-		return new String("Calculating Perturbation, Please waiting...");
+		return new String("Calculating perturbation, please waiting...");
 	}
 }
