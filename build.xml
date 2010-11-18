@@ -19,6 +19,14 @@
 
 	<mkdir dir="${bin.dir}"/>
 	<mkdir dir="${jar.dir}"/>
+   	<available file="${cytoscape.dir}" property="cytoscape.present"/> 
+   	<available file="release/lib" property="lib.present"/> 
+	<fail unless="cytoscape.present" message="Can not find cytoscape, reset the value of cytoscape.dir in build.xml!"/>
+	
+	<target name="unzip-lib" unless="lib.present"> 
+	    <unzip src="lib/jfreechart-1.0.12.jar" dest="release/lib"/>
+		<unzip src="lib/jcommon-1.0.15.jar" dest="release/lib"/>
+	</target>  
 
 	<manifest file="MANIFEST.MF">
 	    <attribute name="Manifest-Version" value="${version}"/>
@@ -40,7 +48,7 @@
         </javac>
    </target>
 	
-  	<target name="compress" depends="compile" description="Compression target">
+  	<target name="compress" depends="compile,unzip-lib" description="Compression target">
         <jar jarfile="${jarfile}" manifest="MANIFEST.MF">
 		    <fileset dir="${bin.dir}" includes="dynamic/*.class"/>
 		    <fileset dir="${src.dir}" includes="dynamic/plugin.props"/>
