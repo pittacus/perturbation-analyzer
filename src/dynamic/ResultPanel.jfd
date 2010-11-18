@@ -44,7 +44,7 @@
            <string>border</string> 
            <object class="javax.swing.border.TitledBorder"> 
             <null/> 
-            <string>Disturbed subgroup</string> 
+            <string>Perturbed subgroup</string> 
             <int>4</int> 
             <int>0</int> 
             <null/> 
@@ -236,7 +236,7 @@
                    <void method="add"> 
                     <object class="java.util.Vector"> 
                      <void method="add"> 
-                      <string>Threshold of disturbed subgroup</string> 
+                      <string>Threshold of perturbed subgroup</string> 
                      </void> 
                      <void method="add"> 
                       <null/> 
@@ -246,7 +246,7 @@
                    <void method="add"> 
                     <object class="java.util.Vector"> 
                      <void method="add"> 
-                      <string>Disturbed subgroup size</string> 
+                      <string>Perturbed subgroup size</string> 
                      </void> 
                      <void method="add"> 
                       <string>2</string> 
@@ -369,7 +369,7 @@
            <string>border</string> 
            <object class="javax.swing.border.TitledBorder"> 
             <null/> 
-            <string>Distribution of Change Ratios of Disturbed Proteins [Source Excluded]</string> 
+            <string>Distribution of Change Ratios of Perturbed Proteins [Source Excluded]</string> 
             <int>4</int> 
             <int>0</int> 
             <null/> 

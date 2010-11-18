@@ -2,7 +2,7 @@
 <project default="release">
 	<propertyfile file="./build.properties">
 		<entry key="major.number" type="int" value="1"/>
-		<entry key="minor.number" type="int" value="0"/>
+		<entry key="minor.number" type="int" value="2"/>
 		<entry key="build.number" type="int" operation="+" value="1" pattern="00"/>
 	    </propertyfile>
 	<property file="./build.properties"/>

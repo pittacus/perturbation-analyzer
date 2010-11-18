@@ -42,6 +42,7 @@ import cytoscape.data.CyAttributes;
 import cytoscape.layout.CyLayoutAlgorithm;
 import cytoscape.layout.CyLayouts;
 import cytoscape.util.CyNetworkNaming;
+import cytoscape.view.CyNetworkView;
 
 
 
@@ -107,24 +108,25 @@ public class ResultPanel extends JPanel {
 
 	private void createSubgroupButtonActionPerformed(ActionEvent e) {
 		highlightButtonActionPerformed(e);
-		String vs = Cytoscape.getCurrentNetworkView().getVisualStyle().getName();
-		CyNetwork network = Cytoscape.getCurrentNetwork();
-
-		Set nodes = network.getSelectedNodes();
-		Set edges = new HashSet();
-		Iterator iterator = network.edgesIterator();
-		while (iterator.hasNext()) {
-			CyEdge edge = (CyEdge) iterator.next();
-			if (nodes.contains(edge.getSource())
-					&& nodes.contains(edge.getTarget()))
-				edges.add(edge);
-		}
-		CyNetwork newNetwork = Cytoscape.createNetwork(nodes, edges,
-				CyNetworkNaming.getSuggestedSubnetworkTitle(network),
-				network);
-		Cytoscape.createNetworkView(newNetwork, " subgroup ["+cutoffSlider.getValue()/100.0D+"]");
-		Cytoscape.getNetworkView(newNetwork.getIdentifier()).setVisualStyle(vs);
-		Cytoscape.getNetworkView(newNetwork.getIdentifier()).redrawGraph(false, true);
+		(new cytoscape.actions.NewWindowSelectedNodesOnlyAction()).actionPerformed(e);
+//		String vs = Cytoscape.getCurrentNetworkView().getVisualStyle().getName();
+//		CyNetwork network = Cytoscape.getCurrentNetwork();
+//
+//		Set nodes = network.getSelectedNodes();
+//		Set edges = new HashSet();
+//		Iterator iterator = network.edgesIterator();
+//		while (iterator.hasNext()) {
+//			CyEdge edge = (CyEdge) iterator.next();
+//			if (nodes.contains(edge.getSource())
+//					&& nodes.contains(edge.getTarget()))
+//				edges.add(edge);
+//		}
+//		CyNetwork newNetwork = Cytoscape.createNetwork(nodes, edges,
+//				CyNetworkNaming.getSuggestedSubnetworkTitle(network),
+//				network);
+//		CyNetworkView newView = Cytoscape.createNetworkView(newNetwork, " subgroup ["+cutoffSlider.getValue()/100.0D+"]");
+//		newView.setVisualStyle(vs);
+//		newView.redrawGraph(false, true);
 //		CyLayoutAlgorithm lyaout = CyLayouts.getLayout("organic");
 //		for(CyLayoutAlgorithm layout:CyLayouts.getAllLayouts()){			
 //			System.out.println(layout);
@@ -153,7 +155,7 @@ public class ResultPanel extends JPanel {
 		setLayout(new BorderLayout());
 
 
-		panel1.setBorder(new TitledBorder("Disturbed subgroup"));
+		panel1.setBorder(new TitledBorder("Perturbed subgroup"));
 		panel1.setLayout(new BorderLayout(0, 5));
 
 		panel2.setLayout(new BoxLayout(panel2, BoxLayout.PAGE_AXIS));
@@ -201,8 +203,8 @@ public class ResultPanel extends JPanel {
 
 		subnetInfo.setModel(new DefaultTableModel(
 			new Object[][] {
-				{"Threshold of disturbed subgroup", null},
-				{"Disturbed subgroup size", "2"},
+				{"Threshold of perturbed subgroup", null},
+				{"Perturbed subgroup size", "2"},
 				{"Average of change ratios", "1.23"},
 				{"Maximum of change ratios", null},
 				{"Minimum of change ratios", null},
@@ -229,7 +231,7 @@ public class ResultPanel extends JPanel {
 		panel1.add(panel2, BorderLayout.CENTER);
 		splitPane.setLeftComponent(panel1);
 
-		rightPane.setBorder(new TitledBorder("Distribution of Change Ratios of Disturbed Proteins [Source Excluded]"));
+		rightPane.setBorder(new TitledBorder("Distribution of Change Ratios of Perturbed Proteins [Source Excluded]"));
 		rightPane.setLayout(new BorderLayout());
 		splitPane.setRightComponent(rightPane);
 		add(splitPane, BorderLayout.CENTER);

@@ -44,7 +44,7 @@
            <string>border</string> 
            <object class="javax.swing.border.TitledBorder"> 
             <null/> 
-            <string>Disturbed subgroup</string> 
+            <string>Perturbed subgroup</string> 
             <int>4</int> 
             <int>0</int> 
             <null/> 
@@ -123,7 +123,7 @@
                    <void method="add"> 
                     <object class="java.util.Vector"> 
                      <void method="add"> 
-                      <string>Threshold of disturbed subgroup</string> 
+                      <string>Threshold of perturbed subgroup</string> 
                      </void> 
                      <void method="add"> 
                       <null/> 
@@ -256,7 +256,7 @@
            <string>border</string> 
            <object class="javax.swing.border.TitledBorder"> 
             <null/> 
-            <string>Distribution of Disturbed Subgroup Sizes</string> 
+            <string>Distribution of Perturbed Subgroup Sizes</string> 
             <int>4</int> 
             <int>0</int> 
             <null/> 
