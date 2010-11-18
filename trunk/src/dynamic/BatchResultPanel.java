@@ -103,7 +103,7 @@ public class BatchResultPanel extends JPanel {
 		setLayout(new BorderLayout());
 
 
-		panel1.setBorder(new TitledBorder("Disturbed subgroup"));
+		panel1.setBorder(new TitledBorder("Perturbed subgroup"));
 		panel1.setLayout(new BorderLayout(0, 5));
 
 		panel2.setLayout(new BoxLayout(panel2, BoxLayout.PAGE_AXIS));
@@ -117,7 +117,7 @@ public class BatchResultPanel extends JPanel {
 
 		subnetInfo.setModel(new DefaultTableModel(
 			new Object[][] {
-				{"Threshold of disturbed subgroup", null},
+				{"Threshold of perturbed subgroup", null},
 				{"Total proteins", ""},
 				{"Average of subgroup sizes", ""},
 				{"Maximum of subgroup sizes", null},
@@ -145,7 +145,7 @@ public class BatchResultPanel extends JPanel {
 		panel1.add(panel2, BorderLayout.CENTER);
 		splitPane.setLeftComponent(panel1);
 
-		rightPane.setBorder(new TitledBorder("Distribution of Disturbed Subgroup Sizes"));
+		rightPane.setBorder(new TitledBorder("Distribution of Perturbed Subgroup Sizes"));
 		rightPane.setLayout(new BorderLayout());
 		splitPane.setRightComponent(rightPane);
 		add(splitPane, BorderLayout.CENTER);

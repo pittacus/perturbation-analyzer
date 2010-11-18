@@ -95,7 +95,7 @@
             <string>javax.swing.JRadioButton</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Single Perturbation Mode</string> 
+             <string>Manual Perturbation Mode</string> 
             </void> 
             <void method="setProperty"> 
              <string>selected</string> 
@@ -160,7 +160,7 @@
               </void> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>All selected nodes perturbated at the same time</string> 
+               <string>All selected nodes are perturbed simultaneously</string> 
               </void> 
               <void method="setProperty"> 
                <string>font</string> 
@@ -244,7 +244,7 @@
               </void> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>One selected node perturbated at a time</string> 
+               <string>Each selected node is perturbed independently</string> 
               </void> 
               <void method="setProperty"> 
                <string>font</string> 

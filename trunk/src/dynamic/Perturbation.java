@@ -898,7 +898,8 @@ public class Perturbation extends CytoscapePlugin implements
 		
 		if (highlightNetwork) {
 			highlightNodes(map, highlight);
-			Cytoscape.getCurrentNetworkView().redrawGraph(false, true);
+			//Cytoscape.getCurrentNetworkView().redrawGraph(false, true);
+			Cytoscape.getCurrentNetworkView().updateView();
 		}
 
 

@@ -335,7 +335,7 @@ public class ControlPanel extends JPanel {
 
 		panel2.setLayout(new BorderLayout());
 
-		singleMode.setText("Single Perturbation Mode");
+		singleMode.setText("Manual Perturbation Mode");
 		singleMode.setSelected(true);
 		singleMode.setFont(UIManager.getFont("Label.font"));
 		panel2.add(singleMode, BorderLayout.NORTH);
@@ -346,7 +346,7 @@ public class ControlPanel extends JPanel {
 		textArea2.setEditable(false);
 		textArea2.setEnabled(false);
 		textArea2.setOpaque(false);
-		textArea2.setText("All selected nodes perturbated at the same time");
+		textArea2.setText("All selected nodes are perturbed simultaneously");
 		textArea2.setFont(UIManager.getFont("Label.font"));
 		panel18.add(textArea2);
 		panel2.add(panel18, BorderLayout.SOUTH);
@@ -364,7 +364,7 @@ public class ControlPanel extends JPanel {
 		textArea3.setEditable(false);
 		textArea3.setEnabled(false);
 		textArea3.setOpaque(false);
-		textArea3.setText("One selected node perturbated at a time");
+		textArea3.setText("Each selected node is perturbed independently");
 		textArea3.setFont(UIManager.getFont("Label.font"));
 		panel17.add(textArea3);
 		panel5.add(panel17, BorderLayout.SOUTH);
